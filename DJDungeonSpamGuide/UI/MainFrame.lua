@@ -1170,8 +1170,8 @@ function Addon:ShowLootTab()
                             if dropRate then
                                 itemBtn.dropRate:SetText(string.format("%.1f%%", dropRate))
                             else
-                                -- Show Unknown if no exact drop rate data
-                                itemBtn.dropRate:SetText("Unknown")
+                                -- Hide drop rate if no data available
+                                itemBtn.dropRate:SetText("")
                             end
                         else
                             -- Set loading icon

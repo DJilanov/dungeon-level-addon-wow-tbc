@@ -1,0 +1,19 @@
+package-as: DJDungeonSpamGuide
+
+enable-nolib-creation: no
+
+manual-changelog:
+  filename: CHANGES.md
+  markup-type: markdown
+
+ignore:
+  - .git
+  - .github
+  - .gitignore
+  - .pkgmeta
+  - README.md
+  - DEVELOPMENT_PLAN.md
+  - DEBUGGING_GUIDE.md
+  - OPTIMIZATION_MODES.md
+  - deploy.sh
+  - table.csv
