@@ -46,27 +46,27 @@ Whether you're a fresh level 60 stepping through the Dark Portal or a seasoned l
 ## 📸 Screenshots
 
 ### Main Interface - Smart Recommendations
-![Main Interface](screenshots/01-main-interface.png)
+![Main Interface](https://raw.githubusercontent.com/DJilanov/ally-level-addon-wow-tbc/main/screenshots/01-main-interface.png)
 *See your current recommendation with optimization modes and faction progress tracking*
 
 ### Outland Dungeon Map
-![Outland Map](screenshots/02-outland-map.png)
+![Outland Map](https://raw.githubusercontent.com/DJilanov/ally-level-addon-wow-tbc/main/screenshots/02-outland-map.png)
 *Interactive map showing all dungeon locations and level ranges*
 
 ### Detailed Loot Information
-![Dungeon Loot](screenshots/03-dungeon-loot.png)
+![Dungeon Loot](https://raw.githubusercontent.com/DJilanov/ally-level-addon-wow-tbc/main/screenshots/03-dungeon-loot.png)
 *Browse boss loot tables to plan your runs*
 
 ### Boss Abilities & Strategy
-![Boss Abilities](screenshots/04-boss-abilities.png)
+![Boss Abilities](https://raw.githubusercontent.com/DJilanov/ally-level-addon-wow-tbc/main/screenshots/04-boss-abilities.png)
 *Study boss mechanics before you pull*
 
 ### Dungeon Maps
-![Dungeon Map](screenshots/05-dungeon-map.png)
+![Dungeon Map](https://raw.githubusercontent.com/DJilanov/ally-level-addon-wow-tbc/main/screenshots/05-dungeon-map.png)
 *View detailed layouts for each instance*
 
 ### Location & Requirements
-![Dungeon Location](screenshots/06-dungeon-location.png)
+![Dungeon Location](https://raw.githubusercontent.com/DJilanov/ally-level-addon-wow-tbc/main/screenshots/06-dungeon-location.png)
 *Find entrance locations and check requirements*
 
 ---
