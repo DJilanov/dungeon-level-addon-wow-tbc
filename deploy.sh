@@ -71,6 +71,7 @@ COPY_ITEMS=(
     "UI"
     "Modules"
     "Locales"
+    "Textures"
     "Libs"
 )
 

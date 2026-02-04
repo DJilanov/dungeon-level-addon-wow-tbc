@@ -56,6 +56,76 @@ function Addon:CreateMainFrame()
     frame.closeButton = CreateFrame("Button", nil, frame, "UIPanelCloseButton")
     frame.closeButton:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -5, -5)
 
+    -- Back button (initially hidden, shown in detail view)
+    frame.backButton = CreateFrame("Button", nil, frame, BackdropTemplateMixin and "BackdropTemplate")
+    frame.backButton:SetSize(80, 30)
+    frame.backButton:SetPoint("TOPLEFT", frame, "TOPLEFT", 15, -20)
+    frame.backButton:SetBackdrop({
+        bgFile = "Interface\\Buttons\\WHITE8X8",
+        edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+        tile = false,
+        edgeSize = 12,
+        insets = {left = 3, right = 3, top = 3, bottom = 3}
+    })
+    frame.backButton:SetBackdropColor(0.3, 0.3, 0.4, 0.9)
+    frame.backButton:SetBackdropBorderColor(0.6, 0.6, 0.7, 1)
+    frame.backButton:EnableMouse(true)
+    frame.backButton:RegisterForClicks("LeftButtonUp")
+
+    frame.backButton.text = frame.backButton:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    frame.backButton.text:SetPoint("CENTER")
+    frame.backButton.text:SetText("< Back")
+
+    frame.backButton:SetScript("OnClick", function(self)
+        Addon:ShowListView()
+    end)
+
+    frame.backButton:SetScript("OnEnter", function(self)
+        self:SetBackdropColor(0.4, 0.4, 0.5, 1)
+        self:SetBackdropBorderColor(0.8, 0.8, 1, 1)
+    end)
+
+    frame.backButton:SetScript("OnLeave", function(self)
+        self:SetBackdropColor(0.3, 0.3, 0.4, 0.9)
+        self:SetBackdropBorderColor(0.6, 0.6, 0.7, 1)
+    end)
+
+    frame.backButton:Hide() -- Hidden by default
+
+    -- World Map button (shows Outland dungeon locations map)
+    frame.worldMapButton = CreateFrame("Button", nil, frame, BackdropTemplateMixin and "BackdropTemplate")
+    frame.worldMapButton:SetSize(90, 30)
+    frame.worldMapButton:SetPoint("TOPLEFT", frame, "TOPLEFT", 15, -20)
+    frame.worldMapButton:SetBackdrop({
+        bgFile = "Interface\\Buttons\\WHITE8X8",
+        edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+        tile = false,
+        edgeSize = 12,
+        insets = {left = 3, right = 3, top = 3, bottom = 3}
+    })
+    frame.worldMapButton:SetBackdropColor(0.2, 0.4, 0.6, 0.9)
+    frame.worldMapButton:SetBackdropBorderColor(0.4, 0.6, 0.8, 1)
+    frame.worldMapButton:EnableMouse(true)
+    frame.worldMapButton:RegisterForClicks("LeftButtonUp")
+
+    frame.worldMapButton.text = frame.worldMapButton:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    frame.worldMapButton.text:SetPoint("CENTER")
+    frame.worldMapButton.text:SetText("World Map")
+
+    frame.worldMapButton:SetScript("OnClick", function(self)
+        Addon:ShowWorldMapView()
+    end)
+
+    frame.worldMapButton:SetScript("OnEnter", function(self)
+        self:SetBackdropColor(0.3, 0.5, 0.7, 1)
+        self:SetBackdropBorderColor(0.5, 0.7, 1, 1)
+    end)
+
+    frame.worldMapButton:SetScript("OnLeave", function(self)
+        self:SetBackdropColor(0.2, 0.4, 0.6, 0.9)
+        self:SetBackdropBorderColor(0.4, 0.6, 0.8, 1)
+    end)
+
     -- Character info header
     frame.header = CreateFrame("Frame", nil, frame, BackdropTemplateMixin and "BackdropTemplate")
     frame.header:SetPoint("TOPLEFT", frame, "TOPLEFT", 15, -50)
@@ -215,7 +285,7 @@ function Addon:CreateMainFrame()
             if Addon.SetTargetFaction then
                 Addon:SetTargetFaction(nil)
             end
-            UIDropDownMenu_SetText(frame.factionDropdown, "Auto")
+            pcall(UIDropDownMenu_SetText, frame.factionDropdown, "Auto")
             frame:Refresh()
         end
         local currentFaction = Addon.GetTargetFaction and Addon:GetTargetFaction() or nil
@@ -240,7 +310,7 @@ function Addon:CreateMainFrame()
                 if Addon.SetTargetFaction then
                     Addon:SetTargetFaction(faction)
                 end
-                UIDropDownMenu_SetText(frame.factionDropdown, faction)
+                pcall(UIDropDownMenu_SetText, frame.factionDropdown, faction)
                 if Addon.Print then
                     Addon:Print(string.format(L["FACTION_CHANGED"], faction))
                 end
@@ -253,6 +323,9 @@ function Addon:CreateMainFrame()
 
     -- Refresh optimization mode buttons function
     frame.RefreshOptModeButtons = function(self)
+        -- Only update optimization buttons in dungeons view
+        if frame.viewMode ~= "dungeons" then return end
+
         local addon = DJDungeonSpamGuide
         local currentMode = addon and addon.GetOptimizationMode and addon:GetOptimizationMode() or "balanced"
         for _, btn in ipairs(frame.optModeButtons) do
@@ -273,6 +346,10 @@ function Addon:CreateMainFrame()
         if currentMode == "rep" then
             frame.factionLabel:Show()
             frame.factionDropdown:Show()
+
+            -- Sync dropdown text with current target faction (protected call to avoid errors)
+            local targetFaction = addon and addon.GetTargetFaction and addon:GetTargetFaction()
+            pcall(UIDropDownMenu_SetText, frame.factionDropdown, targetFaction or "Auto")
         else
             frame.factionLabel:Hide()
             frame.factionDropdown:Hide()
@@ -284,12 +361,13 @@ function Addon:CreateMainFrame()
     frame.listHeader:SetPoint("TOPLEFT", frame.recPanel, "BOTTOMLEFT", 5, -30)
     frame.listHeader:SetText("All Dungeons")
 
-    -- View mode selector - Dungeons and Raids buttons (on same row as optimization buttons)
+    -- View mode selector - Dungeons, Heroics, and Raids buttons (on same row as optimization buttons)
     frame.viewMode = "dungeons" -- default to dungeons
+    frame.navigationView = "list" -- "list" or "detail"
 
-    -- Dungeons button (positioned after faction dropdown, or after opt buttons if dropdown hidden)
+    -- Dungeons button
     frame.dungeonsButton = CreateFrame("Button", "DSTDungeonsBtn", frame, BackdropTemplateMixin and "BackdropTemplate")
-    frame.dungeonsButton:SetSize(100, 30)
+    frame.dungeonsButton:SetSize(85, 30)
     frame.dungeonsButton:SetPoint("LEFT", frame.optModeLabel, "LEFT", 550, 0)
     frame.dungeonsButton:SetFrameLevel(frame:GetFrameLevel() + 2)
     frame.dungeonsButton:EnableMouse(true)
@@ -312,11 +390,11 @@ function Addon:CreateMainFrame()
     frame.dungeonsButton:RegisterForClicks("LeftButtonUp")
 
     frame.dungeonsButton:SetScript("OnClick", function(self)
-        -- Clicking Dungeons button switches TO dungeons view
         frame.viewMode = "dungeons"
-        frame.listHeader:SetText("All Dungeons")
+        frame.listHeader:SetText("Normal Dungeons")
         self:Hide()
-        frame.raidsButton:Show()
+        frame.heroicsButton:Show()
+        frame.raidsButton:Hide()
 
         -- Restore saved optimization mode if exists
         local addon = DJDungeonSpamGuide
@@ -335,7 +413,6 @@ function Addon:CreateMainFrame()
         frame:RefreshOptModeButtons()
         frame:Refresh()
 
-        -- Force scroll to top with delay
         C_Timer.After(0.2, function()
             if frame and frame.scrollFrame then
                 frame.scrollFrame:SetVerticalScroll(0)
@@ -343,9 +420,55 @@ function Addon:CreateMainFrame()
         end)
     end)
 
-    -- Raids button (same position as dungeons button, on optimization row)
+    -- Heroics button
+    frame.heroicsButton = CreateFrame("Button", "DSTHeroicsBtn", frame, BackdropTemplateMixin and "BackdropTemplate")
+    frame.heroicsButton:SetSize(85, 30)
+    frame.heroicsButton:SetPoint("LEFT", frame.optModeLabel, "LEFT", 550, 0)
+    frame.heroicsButton:SetFrameLevel(frame:GetFrameLevel() + 2)
+    frame.heroicsButton:EnableMouse(true)
+    frame.heroicsButton:SetBackdrop({
+        bgFile = "Interface\\Buttons\\WHITE8X8",
+        edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+        tile = false,
+        edgeSize = 12,
+        insets = {left = 3, right = 3, top = 3, bottom = 3}
+    })
+    frame.heroicsButton:SetBackdropColor(0.6, 0.3, 0.7, 0.9)
+    frame.heroicsButton:SetBackdropBorderColor(0.8, 0.5, 0.9, 1)
+
+    frame.heroicsButton.text = frame.heroicsButton:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    frame.heroicsButton.text:SetPoint("CENTER")
+    frame.heroicsButton.text:SetText("Heroics")
+
+    frame.heroicsButton:Enable()
+    frame.heroicsButton:RegisterForClicks("LeftButtonUp")
+
+    frame.heroicsButton:SetScript("OnClick", function(self)
+        frame.viewMode = "heroics"
+        frame.listHeader:SetText("Heroic Dungeons")
+        self:Hide()
+        frame.dungeonsButton:Hide()
+        frame.raidsButton:Show()
+
+        -- Hide optimization buttons in heroics view
+        frame.optModeLabel:Hide()
+        frame.factionLabel:Hide()
+        frame.factionDropdown:Hide()
+        for _, btn in ipairs(frame.optModeButtons) do
+            btn:Hide()
+        end
+        frame:Refresh()
+
+        C_Timer.After(0.2, function()
+            if frame and frame.scrollFrame then
+                frame.scrollFrame:SetVerticalScroll(0)
+            end
+        end)
+    end)
+
+    -- Raids button
     frame.raidsButton = CreateFrame("Button", "DSTRaidsBtn", frame, BackdropTemplateMixin and "BackdropTemplate")
-    frame.raidsButton:SetSize(100, 30)
+    frame.raidsButton:SetSize(85, 30)
     frame.raidsButton:SetPoint("LEFT", frame.optModeLabel, "LEFT", 550, 0)
     frame.raidsButton:SetFrameLevel(frame:GetFrameLevel() + 2)
     frame.raidsButton:EnableMouse(true)
@@ -363,27 +486,17 @@ function Addon:CreateMainFrame()
     frame.raidsButton.text:SetPoint("CENTER")
     frame.raidsButton.text:SetText("Raids")
 
-    -- Enable button and register for clicks
     frame.raidsButton:Enable()
     frame.raidsButton:RegisterForClicks("LeftButtonUp")
 
     frame.raidsButton:SetScript("OnClick", function(self)
-        -- Clicking Raids button switches TO raids view
         frame.viewMode = "raids"
-        frame.listHeader:SetText("All Raids")
+        frame.listHeader:SetText("Raids")
         self:Hide()
+        frame.heroicsButton:Hide()
         frame.dungeonsButton:Show()
 
-        -- Save current mode and switch to balanced for raids view
-        local addon = DJDungeonSpamGuide
-        if addon and addon.GetOptimizationMode then
-            frame.savedOptMode = addon:GetOptimizationMode()
-            if addon.SetOptimizationMode and frame.savedOptMode ~= "balanced" then
-                addon:SetOptimizationMode("balanced")
-            end
-        end
-
-        -- Hide optimization buttons in raids view (they're only for dungeons)
+        -- Hide optimization buttons in raids view
         frame.optModeLabel:Hide()
         frame.factionLabel:Hide()
         frame.factionDropdown:Hide()
@@ -392,7 +505,6 @@ function Addon:CreateMainFrame()
         end
         frame:Refresh()
 
-        -- Force scroll to top with delay
         C_Timer.After(0.2, function()
             if frame and frame.scrollFrame then
                 frame.scrollFrame:SetVerticalScroll(0)
@@ -400,8 +512,9 @@ function Addon:CreateMainFrame()
         end)
     end)
 
-    -- Initially hide dungeons button (dungeons is default active view, so show Raids button to switch)
+    -- Initially hide dungeons button (dungeons is default active view, so show Heroics button to switch)
     frame.dungeonsButton:Hide()
+    frame.raidsButton:Hide()
 
     -- Scroll frame for dungeon list (smaller height to fit faction panel)
     frame.scrollFrame = CreateFrame("ScrollFrame", nil, frame, "UIPanelScrollFrameTemplate")
@@ -467,6 +580,108 @@ function Addon:CreateMainFrame()
         frame.factionBars[factionName] = bar
     end
 
+    -- Detail View Container (initially hidden)
+    frame.detailContainer = CreateFrame("Frame", nil, frame, BackdropTemplateMixin and "BackdropTemplate")
+    frame.detailContainer:SetPoint("TOPLEFT", frame.header, "BOTTOMLEFT", 0, -10)
+    frame.detailContainer:SetSize(670, 420)
+    frame.detailContainer:SetBackdrop({
+        bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
+        edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+        tile = true,
+        tileSize = 16,
+        edgeSize = 12,
+        insets = {left = 3, right = 3, top = 3, bottom = 3}
+    })
+    frame.detailContainer:SetBackdropColor(0.1, 0.1, 0.2, 0.8)
+    frame.detailContainer:Hide()
+
+    -- Dungeon name in detail view
+    frame.detailContainer.dungeonName = frame.detailContainer:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+    frame.detailContainer.dungeonName:SetPoint("TOPLEFT", frame.detailContainer, "TOPLEFT", 10, -8)
+
+    -- Dungeon stats in detail view
+    frame.detailContainer.dungeonStats = frame.detailContainer:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    frame.detailContainer.dungeonStats:SetPoint("TOPLEFT", frame.detailContainer.dungeonName, "BOTTOMLEFT", 0, -5)
+    frame.detailContainer.dungeonStats:SetWidth(650)
+    frame.detailContainer.dungeonStats:SetJustifyH("LEFT")
+
+    -- Tab buttons for detail view
+    frame.detailContainer.tabs = {}
+    local tabNames = {"Loot", "Bosses", "Map", "Location"}
+    for i, tabName in ipairs(tabNames) do
+        local tab = CreateFrame("Button", nil, frame.detailContainer, BackdropTemplateMixin and "BackdropTemplate")
+        tab:SetSize(100, 30)
+        if i == 1 then
+            tab:SetPoint("TOPLEFT", frame.detailContainer.dungeonStats, "BOTTOMLEFT", 0, -10)
+        else
+            tab:SetPoint("LEFT", frame.detailContainer.tabs[i-1], "RIGHT", 5, 0)
+        end
+
+        tab:SetBackdrop({
+            bgFile = "Interface\\Buttons\\WHITE8X8",
+            edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+            tile = false,
+            edgeSize = 12,
+            insets = {left = 3, right = 3, top = 3, bottom = 3}
+        })
+        tab:SetBackdropColor(0.3, 0.3, 0.3, 0.8)
+        tab:SetBackdropBorderColor(0.6, 0.6, 0.6, 1)
+
+        tab.text = tab:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+        tab.text:SetPoint("CENTER")
+        tab.text:SetText(tabName)
+
+        tab.tabName = tabName
+        tab:SetScript("OnClick", function(self)
+            Addon:SelectDetailTab(self.tabName)
+        end)
+
+        frame.detailContainer.tabs[i] = tab
+    end
+
+    -- Content scroll frame for detail view
+    frame.detailScrollFrame = CreateFrame("ScrollFrame", nil, frame.detailContainer, "UIPanelScrollFrameTemplate")
+    frame.detailScrollFrame:SetPoint("TOPLEFT", frame.detailContainer.tabs[1], "BOTTOMLEFT", 0, -10)
+    frame.detailScrollFrame:SetSize(640, 280)
+
+    -- Scroll child for detail view
+    frame.detailScrollChild = CreateFrame("Frame", nil, frame.detailScrollFrame)
+    frame.detailScrollChild:SetSize(620, 1)
+    frame.detailScrollFrame:SetScrollChild(frame.detailScrollChild)
+
+    -- Content text for detail view
+    frame.detailContentText = frame.detailScrollChild:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    frame.detailContentText:SetPoint("TOPLEFT", frame.detailScrollChild, "TOPLEFT", 5, -5)
+    frame.detailContentText:SetWidth(610)
+    frame.detailContentText:SetJustifyH("LEFT")
+    frame.detailContentText:SetJustifyV("TOP")
+    frame.detailContentText:SetSpacing(3)
+
+    -- Container for loot item buttons (used when showing loot)
+    frame.detailLootContainer = CreateFrame("Frame", nil, frame.detailScrollChild)
+    frame.detailLootContainer:SetPoint("TOPLEFT", frame.detailScrollChild, "TOPLEFT", 5, -5)
+    frame.detailLootContainer:SetSize(610, 1)
+    frame.detailLootContainer:Hide()
+
+    frame.lootButtons = {}
+
+    -- Container for map display (used when showing map)
+    frame.detailMapContainer = CreateFrame("Frame", nil, frame.detailScrollChild)
+    frame.detailMapContainer:SetPoint("TOPLEFT", frame.detailScrollChild, "TOPLEFT", 5, -5)
+    frame.detailMapContainer:SetSize(610, 400)
+    frame.detailMapContainer:Hide()
+
+    -- Map texture
+    frame.detailMapTexture = frame.detailMapContainer:CreateTexture(nil, "ARTWORK")
+    frame.detailMapTexture:SetPoint("TOP", frame.detailMapContainer, "TOP", 0, 0)
+    frame.detailMapTexture:SetSize(512, 512)
+
+    -- Map info text
+    frame.detailMapInfo = frame.detailMapContainer:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    frame.detailMapInfo:SetPoint("TOPLEFT", frame.detailMapTexture, "BOTTOMLEFT", 0, -10)
+    frame.detailMapInfo:SetWidth(610)
+    frame.detailMapInfo:SetJustifyH("LEFT")
+
     -- Methods (wrapped to preserve correct self reference)
     frame.Refresh = function() Addon:RefreshMainFrame() end
     frame.RefreshHeader = function() Addon:RefreshHeader() end
@@ -476,6 +691,21 @@ function Addon:CreateMainFrame()
 
     -- Initialize optimization mode buttons
     frame:RefreshOptModeButtons()
+
+    -- Register for item info events to refresh loot display when items finish loading
+    frame:RegisterEvent("GET_ITEM_INFO_RECEIVED")
+    frame:SetScript("OnEvent", function(self, event, itemID, success)
+        if event == "GET_ITEM_INFO_RECEIVED" and success then
+            -- Only refresh if we're in detail view showing loot tab
+            if Addon.MainFrame and Addon.MainFrame.navigationView == "detail" and Addon.MainFrame.currentTab == "Loot" then
+                C_Timer.After(0.1, function()
+                    if Addon and Addon.ShowLootTab then
+                        Addon:ShowLootTab()
+                    end
+                end)
+            end
+        end
+    end)
 
     self.MainFrame = frame
     return frame
@@ -566,7 +796,71 @@ function Addon:RefreshDungeonList()
 
     local yOffset = -5
 
-    if viewMode == "raids" then
+    if viewMode == "heroics" then
+        -- Show heroic dungeons (all TBC dungeons have heroic versions)
+        if not DST.DungeonData then return end
+
+        local playerLevel = UnitLevel("player")
+        local orderedDungeons = DST.DungeonData:GetOrderedDungeons()
+
+        for i, dungeonEntry in ipairs(orderedDungeons) do
+            local name = dungeonEntry.name
+            local data = dungeonEntry.data
+
+            local card = DST.DungeonCard:Create(frame.scrollChild, 620)
+            card:SetPoint("TOPLEFT", frame.scrollChild, "TOPLEFT", 0, yOffset)
+
+            -- Determine heroic status
+            local status = "LOCKED"
+            local statusText = "Requires Level 70"
+            local factionStanding = "N/A"
+
+            if playerLevel >= 70 then
+                -- Check faction reputation for key
+                local factionID = data.factionID
+                if factionID then
+                    local factionName, _, standingID = GetFactionInfoByID(factionID)
+                    -- Revered = 7, Exalted = 8
+                    if standingID and standingID >= 7 then
+                        status = "AVAILABLE"
+                        statusText = "Heroic - Key Obtained"
+                        factionStanding = (standingID == 8) and "Exalted" or "Revered"
+                    else
+                        status = "LOCKED"
+                        statusText = "Requires Revered with " .. data.faction
+                        factionStanding = self.Tracker and self.Tracker:GetFactionStanding(factionID) or "Unknown"
+                    end
+                else
+                    -- No faction requirement (shouldn't happen for TBC dungeons)
+                    status = "AVAILABLE"
+                    statusText = "Heroic"
+                end
+            elseif playerLevel >= 68 then
+                statusText = "Almost Ready (2-3 levels)"
+            end
+
+            -- Create heroic status
+            local heroicStatus = {
+                name = name,
+                data = data,
+                status = status,
+                statusText = statusText,
+                isRecommended = false,
+                isHeroic = true,
+                runsCompleted = 0, -- Could track heroic runs separately
+                runsToRepCap = 0,
+                runsToLevel = 0,
+                factionRep = 0,
+                factionStanding = factionStanding,
+            }
+
+            card:SetDungeon(name, data, heroicStatus)
+            table.insert(frame.dungeonCards, card)
+            card:Show()
+
+            yOffset = yOffset - 55
+        end
+    elseif viewMode == "raids" then
         -- Show raids
         if not DST.RaidData then return end
 
@@ -642,4 +936,670 @@ function Addon:FormatNumber(num)
         if k == 0 then break end
     end
     return formatted
+end
+
+-- Show detail view for a dungeon
+function Addon:ShowDetailView(dungeonName, dungeonData, isHeroic)
+    if not self.MainFrame then return end
+
+    local frame = self.MainFrame
+    frame.navigationView = "detail"
+
+    -- Store current dungeon info
+    frame.currentDungeon = dungeonName
+    frame.currentData = dungeonData
+    frame.isHeroic = isHeroic or false
+
+    -- Hide list view elements
+    frame.recPanel:Hide()
+    frame.listHeader:Hide()
+    frame.scrollFrame:Hide()
+    frame.factionPanel:Hide()
+    frame.optModeLabel:Hide()
+    for _, btn in ipairs(frame.optModeButtons) do
+        btn:Hide()
+    end
+    frame.factionLabel:Hide()
+    frame.factionDropdown:Hide()
+    frame.dungeonsButton:Hide()
+    frame.heroicsButton:Hide()
+    frame.raidsButton:Hide()
+
+    -- Show back button and detail container
+    frame.backButton:Show()
+    frame.detailContainer:Show()
+
+    -- Hide world map button in detail view
+    if frame.worldMapButton then
+        frame.worldMapButton:Hide()
+    end
+
+    -- Update detail view content
+    local displayName = dungeonName
+    if isHeroic then
+        displayName = "|cffff8800HEROIC:|r " .. displayName
+    end
+    frame.detailContainer.dungeonName:SetText("|cff00ff80" .. displayName .. "|r")
+
+    -- Set dungeon stats
+    local statsText = string.format(
+        "Level: |cffffffff%d-%d|r  |  Duration: |cffffffff~%d min|r  |  Faction: |cffffffff%s|r  |  Rep/run: |cffffffff%d|r",
+        dungeonData.minLevel,
+        dungeonData.maxLevel,
+        dungeonData.avgDuration,
+        dungeonData.faction,
+        dungeonData.repPerRun
+    )
+    frame.detailContainer.dungeonStats:SetText(statsText)
+
+    -- Select default tab (Loot)
+    self:SelectDetailTab("Loot")
+end
+
+-- Show list view (back from detail)
+function Addon:ShowListView()
+    if not self.MainFrame then return end
+
+    local frame = self.MainFrame
+    frame.navigationView = "list"
+
+    -- Show list view elements
+    frame.recPanel:Show()
+    frame.listHeader:Show()
+    frame.scrollFrame:Show()
+    frame.factionPanel:Show()
+
+    -- Show appropriate view mode button
+    if frame.viewMode == "dungeons" then
+        frame.optModeLabel:Show()
+        frame:RefreshOptModeButtons()
+        for _, btn in ipairs(frame.optModeButtons) do
+            btn:Show()
+        end
+        frame.heroicsButton:Show()
+    elseif frame.viewMode == "heroics" then
+        frame.raidsButton:Show()
+    elseif frame.viewMode == "raids" then
+        frame.dungeonsButton:Show()
+    end
+
+    -- Hide back button and detail container
+    frame.backButton:Hide()
+    frame.detailContainer:Hide()
+
+    -- Hide world map container if it exists
+    if frame.worldMapContainer then
+        frame.worldMapContainer:Hide()
+    end
+
+    -- Show world map button
+    if frame.worldMapButton then
+        frame.worldMapButton:Show()
+    end
+
+    -- Clear current dungeon
+    frame.currentDungeon = nil
+    frame.currentData = nil
+    frame.isHeroic = nil
+end
+
+-- Select detail tab
+function Addon:SelectDetailTab(tabName)
+    if not self.MainFrame or not self.MainFrame.detailContainer then return end
+
+    local frame = self.MainFrame
+    frame.currentTab = tabName
+
+    -- Update tab appearance
+    for _, tab in ipairs(frame.detailContainer.tabs) do
+        if tab.tabName == tabName then
+            tab:SetBackdropColor(0.2, 0.6, 0.3, 0.9)
+            tab:SetBackdropBorderColor(0, 1, 0, 1)
+        else
+            tab:SetBackdropColor(0.3, 0.3, 0.3, 0.8)
+            tab:SetBackdropBorderColor(0.6, 0.6, 0.6, 1)
+        end
+    end
+
+    -- Update content
+    if tabName == "Loot" then
+        self:ShowLootTab()
+    elseif tabName == "Bosses" then
+        self:ShowBossesTab()
+    elseif tabName == "Map" then
+        self:ShowMapTab()
+    elseif tabName == "Location" then
+        self:ShowLocationTab()
+    end
+
+    -- Reset scroll
+    frame.detailScrollFrame:SetVerticalScroll(0)
+end
+
+-- Show loot tab
+function Addon:ShowLootTab()
+    if not self.MainFrame or not self.MainFrame.currentDungeon then return end
+
+    local frame = self.MainFrame
+
+    -- Hide text content, show loot container
+    frame.detailContentText:Hide()
+    frame.detailLootContainer:Show()
+    frame.detailScrollFrame:Show()
+
+    -- Hide map texture if it exists
+    if frame.mapTextureFrame then
+        frame.mapTextureFrame:Hide()
+    end
+
+    -- Clear existing loot buttons
+    for _, btn in ipairs(frame.lootButtons) do
+        btn:Hide()
+        btn:SetParent(nil)
+    end
+    wipe(frame.lootButtons)
+
+    local lootData = DST.LootData and DST.LootData:GetDungeonLoot(frame.currentDungeon)
+    local yOffset = 0
+
+    if lootData and lootData.bosses then
+        for bossIndex, boss in ipairs(lootData.bosses) do
+            -- Boss name header
+            local bossHeader = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+            bossHeader:SetParent(frame.detailLootContainer)
+            bossHeader:SetPoint("TOPLEFT", frame.detailLootContainer, "TOPLEFT", 0, yOffset)
+            bossHeader:SetText(string.format("|cff00ff80%s|r", boss.name))
+            table.insert(frame.lootButtons, bossHeader)
+            yOffset = yOffset - 20
+
+            if boss.items then
+                local itemList = frame.isHeroic and boss.items.heroic or boss.items.normal
+                if itemList and #itemList > 0 then
+                    local col = 0
+                    local rowOffset = yOffset
+
+                    for itemIndex, itemID in ipairs(itemList) do
+                        -- Create clickable item button
+                        local itemBtn = CreateFrame("Button", nil, frame.detailLootContainer)
+                        itemBtn:SetSize(280, 18)
+
+                        if col == 0 then
+                            itemBtn:SetPoint("TOPLEFT", frame.detailLootContainer, "TOPLEFT", 10, rowOffset)
+                        else
+                            itemBtn:SetPoint("TOPLEFT", frame.detailLootContainer, "TOPLEFT", 320, rowOffset)
+                        end
+
+                        -- Item icon
+                        itemBtn.icon = itemBtn:CreateTexture(nil, "ARTWORK")
+                        itemBtn.icon:SetSize(16, 16)
+                        itemBtn.icon:SetPoint("LEFT", itemBtn, "LEFT", 0, 0)
+
+                        -- Item text
+                        itemBtn.text = itemBtn:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+                        itemBtn.text:SetPoint("LEFT", itemBtn.icon, "RIGHT", 3, 0)
+                        itemBtn.text:SetJustifyH("LEFT")
+                        itemBtn.text:SetWidth(210)
+
+                        -- Drop rate text (right aligned)
+                        itemBtn.dropRate = itemBtn:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+                        itemBtn.dropRate:SetPoint("RIGHT", itemBtn, "RIGHT", 0, 0)
+                        itemBtn.dropRate:SetJustifyH("RIGHT")
+                        itemBtn.dropRate:SetTextColor(0.7, 0.7, 0.7, 1)
+
+                        -- Request item info
+                        local itemName, itemLink, itemQuality, itemLevel, itemMinLevel, itemType, itemSubType,
+                              itemStackCount, itemEquipLoc, itemTexture = GetItemInfo(itemID)
+
+                        if itemLink then
+                            -- Set item icon
+                            if itemTexture then
+                                itemBtn.icon:SetTexture(itemTexture)
+                            else
+                                -- Fallback icon if texture not available
+                                itemBtn.icon:SetTexture("Interface\\Icons\\INV_Misc_QuestionMark")
+                            end
+
+                            -- Get quality color
+                            local r, g, b = GetItemQualityColor(itemQuality or 1)
+                            itemBtn.text:SetTextColor(r, g, b, 1)
+                            itemBtn.text:SetText(itemName or "Item " .. itemID)
+                            itemBtn.itemLink = itemLink
+
+                            -- Get drop rate if available from boss data
+                            local dropRate = boss.dropRates and boss.dropRates[itemID]
+                            if dropRate then
+                                itemBtn.dropRate:SetText(string.format("%.1f%%", dropRate))
+                            else
+                                -- Show Unknown if no exact drop rate data
+                                itemBtn.dropRate:SetText("Unknown")
+                            end
+                        else
+                            -- Set loading icon
+                            itemBtn.icon:SetTexture("Interface\\Icons\\INV_Misc_QuestionMark")
+                            itemBtn.text:SetTextColor(0.67, 0.67, 0.67, 1)
+                            itemBtn.text:SetText("[Loading...]")
+                            itemBtn.itemID = itemID
+                            C_Item.RequestLoadItemDataByID(itemID)
+                        end
+
+                        -- Click to link item in chat
+                        itemBtn:SetScript("OnClick", function(self)
+                            if self.itemLink and IsShiftKeyDown() then
+                                -- Shift-click to link in chat
+                                ChatEdit_InsertLink(self.itemLink)
+                            end
+                        end)
+
+                        -- Hover to show tooltip
+                        itemBtn:SetScript("OnEnter", function(self)
+                            if self.itemLink or self.itemID then
+                                GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+                                if self.itemLink then
+                                    GameTooltip:SetHyperlink(self.itemLink)
+                                else
+                                    GameTooltip:SetItemByID(self.itemID)
+                                end
+                                GameTooltip:Show()
+                            end
+                        end)
+
+                        itemBtn:SetScript("OnLeave", function(self)
+                            GameTooltip:Hide()
+                        end)
+
+                        table.insert(frame.lootButtons, itemBtn)
+
+                        -- Two columns layout
+                        col = col + 1
+                        if col >= 2 then
+                            col = 0
+                            rowOffset = rowOffset - 20
+                        end
+                    end
+
+                    -- Adjust offset for next boss
+                    if col > 0 then
+                        rowOffset = rowOffset - 20
+                    end
+                    yOffset = rowOffset - 10
+                else
+                    local noItems = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+                    noItems:SetParent(frame.detailLootContainer)
+                    noItems:SetPoint("TOPLEFT", frame.detailLootContainer, "TOPLEFT", 10, yOffset)
+                    noItems:SetText("|cffaaaaaa(No items for this difficulty)|r")
+                    table.insert(frame.lootButtons, noItems)
+                    yOffset = yOffset - 20
+                end
+            else
+                local count = frame.isHeroic and (boss.heroic or 0) or (boss.normal or 0)
+                local countText = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+                countText:SetParent(frame.detailLootContainer)
+                countText:SetPoint("TOPLEFT", frame.detailLootContainer, "TOPLEFT", 10, yOffset)
+                countText:SetText(string.format("|cffffffff%d items|r |cffaaaaaa(item data not yet added)|r", count))
+                table.insert(frame.lootButtons, countText)
+                yOffset = yOffset - 20
+            end
+
+            yOffset = yOffset - 5
+        end
+
+        -- Add help text at bottom
+        local helpText = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+        helpText:SetParent(frame.detailLootContainer)
+        helpText:SetPoint("TOPLEFT", frame.detailLootContainer, "TOPLEFT", 0, yOffset - 10)
+        helpText:SetText("|cffaaaaaa* Hover over items to see stats\n* Shift-click to link in chat|r")
+        table.insert(frame.lootButtons, helpText)
+        yOffset = yOffset - 40
+    else
+        local noData = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+        noData:SetParent(frame.detailLootContainer)
+        noData:SetPoint("TOPLEFT", frame.detailLootContainer, "TOPLEFT", 0, yOffset)
+        noData:SetText("|cffff9900No loot information available.|r")
+        table.insert(frame.lootButtons, noData)
+        yOffset = yOffset - 30
+    end
+
+    frame.detailScrollChild:SetHeight(math.max(math.abs(yOffset) + 20, frame.detailScrollFrame:GetHeight()))
+end
+
+-- Show bosses tab
+function Addon:ShowBossesTab()
+    if not self.MainFrame or not self.MainFrame.currentDungeon then return end
+
+    local frame = self.MainFrame
+
+    -- Show text content, hide loot container
+    frame.detailContentText:Show()
+    frame.detailLootContainer:Hide()
+    frame.detailScrollFrame:Show()
+
+    -- Hide map texture if it exists
+    if frame.mapTextureFrame then
+        frame.mapTextureFrame:Hide()
+    end
+
+    local modeText = frame.isHeroic and "|cffff8800Heroic Mode|r" or "|cff00ff80Normal Mode|r"
+    local text = "|cffffd700=== Boss Overview (" .. modeText .. ") ===|r\n\n"
+
+    -- Try to get boss data from BossData.lua
+    local bossData = DST.BossData and DST.BossData:GetDungeonBosses(frame.currentDungeon)
+
+    if bossData and next(bossData) then
+        -- Use BossData for detailed boss information
+        local bossIndex = 1
+        for bossName, data in pairs(bossData) do
+            text = text .. string.format("|cff00ff80%d. %s|r\n", bossIndex, bossName)
+
+            -- Health
+            if data.health then
+                local health = frame.isHeroic and data.health.heroic or data.health.normal
+                if health then
+                    text = text .. string.format("   |cffffffffHealth:|r %s\n", health)
+                end
+            end
+
+            -- Mana
+            if data.mana then
+                local mana = frame.isHeroic and data.mana.heroic or data.mana.normal
+                if mana then
+                    text = text .. string.format("   |cffffffffMana:|r %s\n", mana)
+                end
+            end
+
+            -- Abilities
+            if data.abilities and #data.abilities > 0 then
+                text = text .. "\n   |cffffd700Abilities:|r\n"
+                for _, ability in ipairs(data.abilities) do
+                    text = text .. string.format("   • |cff00ccff%s:|r %s\n", ability.name, ability.desc)
+                end
+            end
+
+            -- Adds
+            if data.adds then
+                text = text .. string.format("\n   |cffff9900Adds:|r %s\n", data.adds)
+            end
+
+            -- Notes
+            if data.notes then
+                text = text .. string.format("\n   |cffaaffaa⚡ Strategy:|r %s\n", data.notes)
+            end
+
+            text = text .. "\n"
+            bossIndex = bossIndex + 1
+        end
+    else
+        -- Fallback to loot data for boss list
+        local lootData = DST.LootData and DST.LootData:GetDungeonLoot(frame.currentDungeon)
+
+        if lootData and lootData.bosses then
+            text = text .. "|cffff9900Boss stats not yet available for this dungeon.|r\n\n"
+            text = text .. "|cffffffffBoss Encounters:|r\n\n"
+            for i, boss in ipairs(lootData.bosses) do
+                text = text .. string.format("|cff00ff80%d. %s|r\n", i, boss.name)
+            end
+        elseif frame.currentData and frame.currentData.guide then
+            text = text .. "|cffffffffBoss encounters:|r\n\n"
+            for i, line in ipairs(frame.currentData.guide) do
+                if line:match("^Boss %d") or line:match("%):") then
+                    text = text .. "|cff00ff80" .. line .. "|r\n\n"
+                else
+                    text = text .. line .. "\n"
+                end
+            end
+        else
+            text = text .. "|cffff9900No boss information available.|r"
+        end
+    end
+
+    frame.detailContentText:SetText(text)
+    frame.detailScrollChild:SetHeight(math.max(frame.detailContentText:GetStringHeight() + 20, frame.detailScrollFrame:GetHeight()))
+end
+
+-- Show strategy tab
+function Addon:ShowStrategyTab()
+    if not self.MainFrame or not self.MainFrame.currentData then return end
+
+    local frame = self.MainFrame
+
+    -- Show text content, hide loot container
+    frame.detailContentText:Show()
+    frame.detailLootContainer:Hide()
+
+    local data = frame.currentData
+
+    if not data.guide or #data.guide == 0 then
+        frame.detailContentText:SetText("|cffff9900No strategy guide available.|r")
+        frame.detailScrollChild:SetHeight(50)
+        return
+    end
+
+    local text = "|cffffd700=== Dungeon Strategy Guide ===|r\n\n"
+    text = text .. "|cffffffffLocation:|r " .. (data.entrance or data.zone) .. "\n\n"
+    text = text .. "|cffffd700Boss Strategies:|r\n\n"
+
+    for i, line in ipairs(data.guide) do
+        if line:match("^Boss %d") or line:match("%):") or line:match("^%w+ %d+:") then
+            text = text .. "|cff00ff80" .. line .. "|r\n"
+        else
+            text = text .. "   " .. line .. "\n"
+        end
+    end
+
+    if data.requiredFor and #data.requiredFor > 0 then
+        text = text .. "\n|cffffd700Important for:|r\n"
+        for _, req in ipairs(data.requiredFor) do
+            text = text .. "   • " .. req .. "\n"
+        end
+    end
+
+    frame.detailContentText:SetText(text)
+    frame.detailScrollChild:SetHeight(math.max(frame.detailContentText:GetStringHeight() + 20, frame.detailScrollFrame:GetHeight()))
+end
+
+-- Show map tab
+function Addon:ShowMapTab()
+    if not self.MainFrame or not self.MainFrame.currentDungeon then return end
+
+    local frame = self.MainFrame
+
+    -- Hide text content and loot container, we'll use the map texture
+    frame.detailContentText:Hide()
+    frame.detailLootContainer:Hide()
+    frame.detailScrollFrame:Hide()
+
+    -- Create map texture frame if it doesn't exist (parent to detailContainer, not scrollChild)
+    if not frame.mapTextureFrame then
+        frame.mapTextureFrame = CreateFrame("Frame", nil, frame.detailContainer)
+        frame.mapTextureFrame:SetPoint("CENTER", frame.detailContainer, "CENTER", 0, -50)
+        frame.mapTextureFrame:SetSize(500, 400)
+
+        -- Map texture (dungeon maps are 1002x668, so use 450x300 to maintain aspect ratio)
+        frame.mapTextureFrame.texture = frame.mapTextureFrame:CreateTexture(nil, "ARTWORK")
+        frame.mapTextureFrame.texture:SetPoint("CENTER")
+        frame.mapTextureFrame.texture:SetSize(450, 300)
+        frame.mapTextureFrame.texture:SetTexCoord(0, 1, 0, 1)  -- Reset texture coordinates
+        frame.mapTextureFrame.texture:SetBlendMode("BLEND")     -- Set blend mode
+
+        -- Info text below map
+        frame.mapTextureFrame.infoText = frame.mapTextureFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+        frame.mapTextureFrame.infoText:SetPoint("TOP", frame.mapTextureFrame.texture, "BOTTOM", 0, -10)
+        frame.mapTextureFrame.infoText:SetWidth(450)
+        frame.mapTextureFrame.infoText:SetJustifyH("CENTER")
+    end
+
+    frame.mapTextureFrame:Show()
+
+    -- Try to load dungeon map texture
+    local dungeonKey = frame.currentDungeon
+    local mapPath = self:GetDungeonMapTexture(dungeonKey)
+
+    if mapPath then
+        frame.mapTextureFrame.texture:SetTexture(mapPath)
+        frame.mapTextureFrame.texture:SetTexCoord(0, 1, 0, 1)  -- Reset coords each time
+        frame.mapTextureFrame.texture:Show()
+        frame.mapTextureFrame.infoText:SetText("|cff00ff80" .. dungeonKey .. " Map|r")
+    else
+        -- Show placeholder
+        frame.mapTextureFrame.texture:Hide()
+        frame.mapTextureFrame.infoText:SetText("|cffff9900Map texture not available\n|cffffffffUse in-game map (M) to view dungeon layout|r")
+    end
+end
+
+-- Get dungeon map texture path
+function Addon:GetDungeonMapTexture(dungeonName)
+    -- Map of dungeon names to our downloaded texture files
+    local mapTextures = {
+        -- TBC Dungeons - using our downloaded maps from Textures folder (uncompressed TGA)
+        ["Hellfire Ramparts"] = "Interface\\AddOns\\DJDungeonSpamGuide\\Textures\\HellfireRamparts_Map",
+        ["Blood Furnace"] = "Interface\\AddOns\\DJDungeonSpamGuide\\Textures\\BloodFurnace_Map",
+        ["Slave Pens"] = "Interface\\AddOns\\DJDungeonSpamGuide\\Textures\\SlavePens_Map",
+        ["Underbog"] = "Interface\\AddOns\\DJDungeonSpamGuide\\Textures\\Underbog_Map",
+        ["Mana-Tombs"] = "Interface\\AddOns\\DJDungeonSpamGuide\\Textures\\Mana-Tombs_Map",
+        ["Auchenai Crypts"] = "Interface\\AddOns\\DJDungeonSpamGuide\\Textures\\AuchenaiCrypts_Map",
+        ["Sethekk Halls"] = "Interface\\AddOns\\DJDungeonSpamGuide\\Textures\\SethekkHalls_Map",
+        ["Shadow Labyrinth"] = "Interface\\AddOns\\DJDungeonSpamGuide\\Textures\\ShadowLabyrinth_Map",
+        ["Steamvault"] = "Interface\\AddOns\\DJDungeonSpamGuide\\Textures\\Steamvault_Map",
+        ["Botanica"] = "Interface\\AddOns\\DJDungeonSpamGuide\\Textures\\Botanica_Map",
+        ["Mechanar"] = "Interface\\AddOns\\DJDungeonSpamGuide\\Textures\\Mechanar_Map",
+        ["Arcatraz"] = "Interface\\AddOns\\DJDungeonSpamGuide\\Textures\\Arcatraz_Map",
+        ["Old Hillsbrad"] = "Interface\\AddOns\\DJDungeonSpamGuide\\Textures\\OldHillsbrad_Map",
+        ["Black Morass"] = "Interface\\AddOns\\DJDungeonSpamGuide\\Textures\\BlackMorass_Map",
+        ["Shattered Halls"] = "Interface\\AddOns\\DJDungeonSpamGuide\\Textures\\ShatteredHalls_Map",
+    }
+
+    return mapTextures[dungeonName]
+end
+
+-- Show World Map view (Outland dungeon locations)
+function Addon:ShowWorldMapView()
+    if not self.MainFrame then return end
+
+    local frame = self.MainFrame
+    frame.navigationView = "worldmap"
+
+    -- Hide list view elements
+    frame.recPanel:Hide()
+    frame.listHeader:Hide()
+    frame.scrollFrame:Hide()
+    frame.factionPanel:Hide()
+
+    -- Hide all view mode buttons
+    if frame.optModeLabel then frame.optModeLabel:Hide() end
+    for _, btn in ipairs(frame.optModeButtons or {}) do
+        btn:Hide()
+    end
+    frame.heroicsButton:Hide()
+    frame.raidsButton:Hide()
+    frame.dungeonsButton:Hide()
+
+    -- Show back button
+    frame.backButton:Show()
+
+    -- Hide detail container (using scroll frame for map instead)
+    if frame.detailContainer then
+        frame.detailContainer:Hide()
+    end
+
+    -- Hide world map button when in world map view
+    frame.worldMapButton:Hide()
+
+    -- Create or show world map container
+    if not frame.worldMapContainer then
+        frame.worldMapContainer = CreateFrame("Frame", nil, frame, BackdropTemplateMixin and "BackdropTemplate")
+        frame.worldMapContainer:SetPoint("TOPLEFT", frame, "TOPLEFT", 15, -65)
+        frame.worldMapContainer:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -15, 15)
+        frame.worldMapContainer:SetBackdrop({
+            bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
+            edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+            tile = true,
+            tileSize = 16,
+            edgeSize = 16,
+            insets = {left = 4, right = 4, top = 4, bottom = 4}
+        })
+        frame.worldMapContainer:SetBackdropColor(0, 0, 0, 0.8)
+        frame.worldMapContainer:SetBackdropBorderColor(0.4, 0.4, 0.4, 1)
+
+        -- Title
+        frame.worldMapContainer.title = frame.worldMapContainer:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+        frame.worldMapContainer.title:SetPoint("TOP", 0, -10)
+        frame.worldMapContainer.title:SetText("|cffffd700TBC Outland Dungeon Locations|r")
+
+        -- Map texture
+        frame.worldMapContainer.texture = frame.worldMapContainer:CreateTexture(nil, "ARTWORK")
+        frame.worldMapContainer.texture:SetPoint("CENTER", 0, -10)
+        frame.worldMapContainer.texture:SetSize(600, 400)
+
+        -- Info text
+        frame.worldMapContainer.infoText = frame.worldMapContainer:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+        frame.worldMapContainer.infoText:SetPoint("BOTTOM", 0, 10)
+        frame.worldMapContainer.infoText:SetWidth(600)
+        frame.worldMapContainer.infoText:SetJustifyH("CENTER")
+    end
+
+    frame.worldMapContainer:Show()
+
+    -- Load Outland dungeon locations map
+    local mapPath = "Interface\\AddOns\\DJDungeonSpamGuide\\Textures\\Outland_DungeonMap"
+    if frame.worldMapContainer.texture:SetTexture(mapPath) then
+        frame.worldMapContainer.texture:Show()
+        frame.worldMapContainer.infoText:SetText("|cff00ff80Outland Dungeon Locations Map|r")
+    else
+        frame.worldMapContainer.texture:Hide()
+        frame.worldMapContainer.infoText:SetText("|cffff9900Map texture not available|r")
+    end
+end
+
+-- Show location tab
+function Addon:ShowLocationTab()
+    if not self.MainFrame or not self.MainFrame.currentData then return end
+
+    local frame = self.MainFrame
+
+    -- Show text content, hide loot container
+    frame.detailContentText:Show()
+    frame.detailLootContainer:Hide()
+    frame.detailScrollFrame:Show()
+
+    -- Hide map texture if it exists
+    if frame.mapTextureFrame then
+        frame.mapTextureFrame:Hide()
+    end
+
+    local data = frame.currentData
+
+    local text = "|cffffd700=== Location & Entrance ===|r\n\n"
+    text = text .. "|cffffffffZone:|r |cff00ff80" .. (data.zone or "Unknown") .. "|r\n"
+    text = text .. "|cffffffffEntrance:|r " .. (data.entrance or data.zone or "Unknown") .. "\n\n"
+
+    text = text .. "|cffffd700Requirements:|r\n"
+    text = text .. string.format("   Level: |cffffffff%d-%d|r", data.minLevel, data.maxLevel)
+    if frame.isHeroic then
+        text = text .. " |cffff8800(Level 70 required for Heroic)|r\n"
+        text = text .. string.format("   Faction Key: |cffffffff%s (Revered)|r\n", data.faction)
+    else
+        text = text .. "\n"
+    end
+    text = text .. "\n"
+
+    text = text .. "|cffffd700Dungeon Information:|r\n"
+    text = text .. string.format("   Average Duration: |cffffffff~%d minutes|r\n", data.avgDuration or 25)
+    text = text .. string.format("   Associated Faction: |cffffffff%s|r\n", data.faction)
+
+    if data.requiredFor and #data.requiredFor > 0 then
+        text = text .. "\n|cffffd700Important For:|r\n"
+        for _, requirement in ipairs(data.requiredFor) do
+            text = text .. "   • " .. requirement .. "\n"
+        end
+    end
+
+    text = text .. "\n|cffffd700Reputation Gain:|r\n"
+    text = text .. string.format("   Per Run: |cffffffff%d rep|r\n", data.repPerRun or 0)
+    text = text .. string.format("   Cap: |cffffffff%s (%d rep)|r\n", data.repCap or "Unknown", data.repCapValue or 0)
+
+    if frame.isHeroic then
+        text = text .. "\n|cffaaaaaa* Heroic mode grants reputation beyond normal cap\n* Heroic keys obtained at Revered reputation\n* Daily quest available for additional rewards|r"
+    end
+
+    frame.detailContentText:SetText(text)
+    frame.detailScrollChild:SetHeight(math.max(frame.detailContentText:GetStringHeight() + 20, frame.detailScrollFrame:GetHeight()))
 end

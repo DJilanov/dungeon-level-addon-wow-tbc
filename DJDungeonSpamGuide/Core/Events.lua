@@ -64,6 +64,16 @@ function EventFrame:OnAddonLoaded(loadedAddon)
         Addon.ZoneDetection:Init()
     end
 
+    -- Initialize UI
+    if DST.MinimapButton then
+        DST.MinimapButton:Init()
+    end
+
+    -- Create main frame (but don't show it)
+    if Addon.CreateMainFrame then
+        Addon:CreateMainFrame()
+    end
+
     -- Show welcome message on first login
     if Addon.charDB and Addon.charDB.firstLogin then
         Addon:Print(L["ADDON_LOADED"])

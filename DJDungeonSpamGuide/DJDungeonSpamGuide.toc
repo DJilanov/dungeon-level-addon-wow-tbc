@@ -18,17 +18,21 @@ Data/ExpPerLevel.lua
 Data/ReputationThresholds.lua
 Data/DungeonData.lua
 Data/RaidData.lua
+Data/LootData.lua
+Data/BossData.lua
 
-# Core (continued - depends on data)
-Core/Events.lua
-Core/SlashCommands.lua
-
-# Modules
+# Modules (must be loaded before Events)
 Modules/Tracker.lua
 Modules/Recommender.lua
 Modules/ZoneDetection.lua
 
-# UI
+# UI (must be loaded before Events)
 UI/ProgressBar.lua
 UI/DungeonCard.lua
+UI/DungeonDetailFrame.lua
+UI/MinimapButton.lua
 UI/MainFrame.lua
+
+# Core (continued - depends on data, modules, and UI)
+Core/Events.lua
+Core/SlashCommands.lua

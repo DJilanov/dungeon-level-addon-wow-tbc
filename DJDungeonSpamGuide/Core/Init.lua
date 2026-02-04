@@ -33,6 +33,7 @@ local defaults = {
         showOnDarkPortal = true,
         showOnDungeonEnter = true,
         showMinimapButton = true,
+        minimapButtonAngle = 220,
         frameScale = 1.0,
         framePosition = {
             point = "CENTER",

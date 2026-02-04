@@ -2,7 +2,12 @@
   "permissions": {
     "allow": [
       "Bash(git fetch:*)",
-      "Read(//Applications/World of Warcraft/**)"
+      "Read(//Applications/World of Warcraft/**)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Read(//Applications/**)"
+    ],
+    "additionalDirectories": [
+      "/Users/dimitarjilanov/work/test/level-planner/DJDungeonSpamGuide/Textures"
     ]
   }
 }

@@ -11,7 +11,7 @@ local DungeonCard = DST.DungeonCard
 
 -- Create a dungeon info card
 function DungeonCard:Create(parent, width)
-    local card = CreateFrame("Frame", nil, parent, BackdropTemplateMixin and "BackdropTemplate")
+    local card = CreateFrame("Button", nil, parent, BackdropTemplateMixin and "BackdropTemplate")
     card:SetSize(width or 540, 50)
     card:SetBackdrop({
         bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
@@ -49,6 +49,18 @@ function DungeonCard:Create(parent, width)
 
     -- Make clickable
     card:EnableMouse(true)
+    card:RegisterForClicks("LeftButtonUp")
+
+    card:SetScript("OnClick", function(self)
+        if self.dungeonName and self.dungeonData then
+            local isHeroic = self.statusInfo and self.statusInfo.isHeroic
+            local addon = DJDungeonSpamGuide
+            if addon and addon.ShowDetailView then
+                addon:ShowDetailView(self.dungeonName, self.dungeonData, isHeroic)
+            end
+        end
+    end)
+
     card:SetScript("OnEnter", function(self)
         self:SetBackdropBorderColor(1, 0.82, 0, 1)
         if self.dungeonName then
@@ -58,15 +70,22 @@ function DungeonCard:Create(parent, width)
     card:SetScript("OnLeave", function(self)
         local status = self.cardStatus or "AVAILABLE"
         local isTargetFaction = self.statusInfo and self.statusInfo.isTargetFaction
+        local isHeroic = self.statusInfo and self.statusInfo.isHeroic
 
         if status == "COMPLETE" then
             self:SetBackdropBorderColor(0.0, 1.0, 0.0, 1)
         elseif status == "RECOMMENDED" then
             self:SetBackdropBorderColor(0.0, 1.0, 0.5, 1)
         elseif status == "LOCKED" then
-            self:SetBackdropBorderColor(0.5, 0.5, 0.5, 1)
-        elseif isTargetFaction then
+            if isHeroic then
+                self:SetBackdropBorderColor(0.8, 0.4, 0.0, 1)
+            else
+                self:SetBackdropBorderColor(0.5, 0.5, 0.5, 1)
+            end
+        elseif isTargetFaction and not isHeroic then
             self:SetBackdropBorderColor(0.4, 0.6, 1.0, 1)
+        elseif isHeroic then
+            self:SetBackdropBorderColor(0.7, 0.3, 0.9, 1)
         else
             self:SetBackdropBorderColor(0.6, 0.6, 0.6, 1)
         end
@@ -99,7 +118,12 @@ function DungeonCard:UpdateCard()
     -- Store status
     self.cardStatus = status.status
 
-    -- Set dungeon name
+    -- Set dungeon name (with HEROIC prefix if applicable)
+    local displayName = self.dungeonName
+    if status.isHeroic then
+        displayName = "|cffff8800HEROIC:|r " .. displayName
+    end
+
     local nameColor = C.COLORS.AVAILABLE
     if status.isRecommended then
         nameColor = C.COLORS.RECOMMENDED
@@ -109,18 +133,31 @@ function DungeonCard:UpdateCard()
         self:SetBackdropBorderColor(0.0, 1.0, 0.0, 1)
     elseif status.status == "LOCKED" then
         nameColor = C.COLORS.LOCKED
-        self:SetBackdropBorderColor(0.5, 0.5, 0.5, 1)
+        if status.isHeroic then
+            -- Orange/red border for locked heroics
+            self:SetBackdropBorderColor(0.8, 0.4, 0.0, 1)
+        else
+            self:SetBackdropBorderColor(0.5, 0.5, 0.5, 1)
+        end
     else
-        self:SetBackdropBorderColor(0.6, 0.6, 0.6, 1)
+        if status.isHeroic then
+            -- Purple border for available heroics
+            self:SetBackdropBorderColor(0.7, 0.3, 0.9, 1)
+        else
+            self:SetBackdropBorderColor(0.6, 0.6, 0.6, 1)
+        end
     end
 
-    -- Highlight target faction dungeons with subtle tint
-    if status.isTargetFaction then
+    -- Highlight target faction dungeons with subtle tint (only for non-heroics)
+    if status.isTargetFaction and not status.isHeroic then
         self:SetBackdropColor(0.15, 0.15, 0.25, 0.9)
         -- Add a slight blue tint to border for target faction
         if not status.isRecommended and status.status ~= "COMPLETE" and status.status ~= "LOCKED" then
             self:SetBackdropBorderColor(0.4, 0.6, 1.0, 1)
         end
+    elseif status.isHeroic then
+        -- Darker background for heroics
+        self:SetBackdropColor(0.15, 0.08, 0.15, 0.9)
     else
         self:SetBackdropColor(0.1, 0.1, 0.1, 0.8)
     end
@@ -129,7 +166,7 @@ function DungeonCard:UpdateCard()
         nameColor[1] * 255,
         nameColor[2] * 255,
         nameColor[3] * 255,
-        self.dungeonName
+        displayName
     ))
 
     -- Set status
@@ -139,9 +176,19 @@ function DungeonCard:UpdateCard()
     elseif status.status == "COMPLETE" then
         statusText = "|cff00ff00" .. L["COMPLETE"] .. "|r"
     elseif status.status == "LOCKED" then
-        statusText = string.format("|cff999999%s (Lvl %d)|r", L["LOCKED"], data.minLevel)
+        if status.statusText then
+            -- Use custom status text for heroics
+            statusText = string.format("|cff999999%s|r", status.statusText)
+        else
+            statusText = string.format("|cff999999%s (Lvl %d)|r", L["LOCKED"], data.minLevel)
+        end
     else
-        statusText = string.format("|cffffffff%s|r", L["AVAILABLE"])
+        if status.statusText then
+            -- Use custom status text (e.g., "Heroic - Key Obtained")
+            statusText = string.format("|cffffffff%s|r", status.statusText)
+        else
+            statusText = string.format("|cffffffff%s|r", L["AVAILABLE"])
+        end
     end
     self.status:SetText(statusText)
 
@@ -155,6 +202,12 @@ function DungeonCard:UpdateCard()
     if status.runsCompleted > 0 then
         factionText = factionText .. string.format(" | Runs: %d", status.runsCompleted)
     end
+
+    -- Add rep and exp per run
+    factionText = factionText .. string.format(" | Rep: %d  XP: %s",
+        data.repPerRun or 0,
+        data.expPerRun and string.format("%.1fk", data.expPerRun / 1000) or "0"
+    )
 
     self.factionInfo:SetText(factionText)
 

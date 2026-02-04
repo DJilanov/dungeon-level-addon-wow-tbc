@@ -171,9 +171,7 @@ function Recommender:GetRepOptimizedRecommendation()
             if Addon.SetTargetFaction then
                 Addon:SetTargetFaction(nil)
             end
-            if Addon.MainFrame and Addon.MainFrame.factionDropdown then
-                UIDropDownMenu_SetText(Addon.MainFrame.factionDropdown, "Auto")
-            end
+            -- Note: Dropdown will be updated on next manual refresh to avoid protected action errors
             return self:GetRepOptimizedRecommendation()
         end
     end
