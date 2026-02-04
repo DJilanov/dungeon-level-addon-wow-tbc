@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 1.0.3
+- Fixed packaging to exclude screenshots folder (reduces download size by 17MB)
+- Cleaned up package to only include essential addon files
+
 ## Version 1.0.2
 - Added complete TBC raid support with 9 raids:
   - Karazhan, Gruul's Lair, Magtheridon's Lair

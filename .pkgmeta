@@ -14,8 +14,12 @@ ignore:
   - .github
   - .gitignore
   - .pkgmeta
+  - README.md
+  - DEPLOYMENT.md
   - DEVELOPMENT_PLAN.md
   - DEBUGGING_GUIDE.md
   - OPTIMIZATION_MODES.md
   - deploy.sh
   - table.csv
+  - screenshots
+  - Textures/README.md

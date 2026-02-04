@@ -2,7 +2,7 @@
 ## Title: |cff00ff00DJ Dungeon Spam Guide|r
 ## Notes: Track TBC dungeon spam progress for optimal leveling and reputation gains
 ## Author: Dimitar Jilanov
-## Version: 1.0.2
+## Version: 1.0.3
 ## SavedVariables: DJDungeonSpamGuideDB
 ## IconTexture: Interface\Icons\INV_Misc_Book_09
 
