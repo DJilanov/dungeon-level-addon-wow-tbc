@@ -155,10 +155,15 @@ function DetailFrame:Show(dungeonName, dungeonData, isHeroic)
     frame.dungeonName:SetText("|cff00ff80" .. displayName .. "|r")
 
     -- Set dungeon stats
+    local levelText
+    if isHeroic then
+        levelText = "70"
+    else
+        levelText = string.format("%d-%d", dungeonData.minLevel, dungeonData.maxLevel)
+    end
     local statsText = string.format(
-        "Level: |cffffffff%d-%d|r  |  Duration: |cffffffff~%d min|r  |  Faction: |cffffffff%s|r",
-        dungeonData.minLevel,
-        dungeonData.maxLevel,
+        "Level: |cffffffff%s|r  |  Duration: |cffffffff~%d min|r  |  Faction: |cffffffff%s|r",
+        levelText,
         dungeonData.avgDuration,
         dungeonData.faction
     )
@@ -226,18 +231,37 @@ end
 
 -- Show bosses tab
 function DetailFrame:ShowBossesTab(frame)
-    local modeText = frame.isHeroic and "|cffff8800Heroic Mode|r" or "|cff00ff80Normal Mode|r"
+    local modeText = frame.isHeroic and "|cffff8800Heroic Mode|r" or (frame.isRaid and "|cffff00ffRaid|r" or "|cff00ff80Normal Mode|r")
     local text = "|cffffd700=== Boss Overview (" .. modeText .. ") ===|r\n\n"
 
     -- Try cached loot data first, then fallback to guide
-    local lootData = DST.LootData and DST.LootData:GetDungeonLoot(frame.currentDungeon)
+    local lootData
+    if frame.isRaid then
+        lootData = DST.LootData and DST.LootData:GetRaidLoot(frame.currentDungeon)
+    else
+        lootData = DST.LootData and DST.LootData:GetDungeonLoot(frame.currentDungeon)
+    end
 
     if lootData and lootData.bosses then
         -- Show bosses from cached loot data
         for i, boss in ipairs(lootData.bosses) do
             text = text .. string.format("|cff00ff80%d. %s|r\n", i, boss.name)
 
-            if frame.isHeroic then
+            if frame.isRaid then
+                -- Raids: show actual items
+                if boss.items and #boss.items > 0 then
+                    text = text .. string.format("   Loot: |cffffffff%d items|r\n", #boss.items)
+                    -- Display first few items as preview
+                    local maxPreview = 5
+                    for idx = 1, math.min(#boss.items, maxPreview) do
+                        local itemID = boss.items[idx]
+                        text = text .. "      " .. (select(2, GetItemInfo(itemID)) or "[Item "..itemID.."]") .. "\n"
+                    end
+                    if #boss.items > maxPreview then
+                        text = text .. "      |cffaaaaaa... and " .. (#boss.items - maxPreview) .. " more|r\n"
+                    end
+                end
+            elseif frame.isHeroic then
                 -- Show only heroic loot in heroic mode
                 if boss.heroic and boss.heroic > 0 then
                     text = text .. string.format("   Loot: |cffffffff%d items|r\n", boss.heroic)
@@ -270,20 +294,39 @@ end
 
 -- Show loot tab
 function DetailFrame:ShowLootTab(frame)
-    local modeText = frame.isHeroic and "|cffff8800Heroic Mode|r" or "|cff00ff80Normal Mode|r"
+    local modeText = frame.isHeroic and "|cffff8800Heroic Mode|r" or (frame.isRaid and "|cffff00ffRaid|r" or "|cff00ff80Normal Mode|r")
     local text = "|cffffd700=== Loot Information (" .. modeText .. ") ===|r\n\n"
 
-    local lootData = DST.LootData and DST.LootData:GetDungeonLoot(frame.currentDungeon)
+    local lootData
+    if frame.isRaid then
+        lootData = DST.LootData and DST.LootData:GetRaidLoot(frame.currentDungeon)
+    else
+        lootData = DST.LootData and DST.LootData:GetDungeonLoot(frame.currentDungeon)
+    end
 
     if lootData and lootData.bosses then
         -- Use cached loot data
-        text = text .. "This dungeon drops loot from the following bosses:\n\n"
+        if frame.isRaid then
+            text = text .. "This raid drops loot from the following bosses:\n\n"
+        else
+            text = text .. "This dungeon drops loot from the following bosses:\n\n"
+        end
 
         local totalItems = 0
         for i, boss in ipairs(lootData.bosses) do
             text = text .. string.format("|cff00ff80%s|r\n", boss.name)
 
-            if frame.isHeroic then
+            if frame.isRaid then
+                -- Raids: show actual items
+                if boss.items and #boss.items > 0 then
+                    text = text .. string.format("   Drops: |cffffffff%d items|r\n", #boss.items)
+                    -- Display item links
+                    for _, itemID in ipairs(boss.items) do
+                        text = text .. "      " .. (select(2, GetItemInfo(itemID)) or "[Item "..itemID.."]") .. "\n"
+                    end
+                    totalItems = totalItems + #boss.items
+                end
+            elseif frame.isHeroic then
                 -- Show only heroic loot in heroic mode
                 if boss.heroic and boss.heroic > 0 then
                     text = text .. string.format("   Drops: |cffffffff%d items|r\n", boss.heroic)
@@ -300,7 +343,11 @@ function DetailFrame:ShowLootTab(frame)
         end
 
         text = text .. string.format("\n|cffffd700Total available items:|r |cffffffff%d|r\n", totalItems)
-        text = text .. "\n|cffaaaaaa" .. (frame.isHeroic and "Heroic dungeons drop epic (purple) gear" or "Normal dungeons drop rare (blue) gear") .. "|r"
+        if frame.isRaid then
+            text = text .. "\n|cffaaaaaa" .. "Raids drop epic (purple) and legendary (orange) gear" .. "|r"
+        else
+            text = text .. "\n|cffaaaaaa" .. (frame.isHeroic and "Heroic dungeons drop epic (purple) gear" or "Normal dungeons drop rare (blue) gear") .. "|r"
+        end
     else
         text = text .. "|cffff9900No loot information available.|r"
     end
@@ -402,12 +449,11 @@ function DetailFrame:ShowLocationTab(frame)
 
     -- Level requirement
     text = text .. "|cffffd700Requirements:|r\n"
-    text = text .. string.format("   Level: |cffffffff%d-%d|r", data.minLevel, data.maxLevel)
     if frame.isHeroic then
-        text = text .. " |cffff8800(Level 70 required for Heroic)|r\n"
+        text = text .. "   Level: |cffffffff70|r |cffff8800(Heroic)|r\n"
         text = text .. string.format("   Faction Key: |cffffffff%s (Revered)|r\n", data.faction)
     else
-        text = text .. "\n"
+        text = text .. string.format("   Level: |cffffffff%d-%d|r\n", data.minLevel, data.maxLevel)
     end
     text = text .. "\n"
 

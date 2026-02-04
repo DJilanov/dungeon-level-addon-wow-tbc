@@ -193,30 +193,52 @@ function DungeonCard:UpdateCard()
     self.status:SetText(statusText)
 
     -- Set faction info
-    local factionText = string.format("%s | %s / %s",
-        data.faction,
-        status.factionStanding or "Unknown",
-        data.repCap
-    )
+    local factionText
+    local isRaid = (data.size ~= nil) -- Raids have 'size' field (10 or 25), dungeons don't
 
-    if status.runsCompleted > 0 then
-        factionText = factionText .. string.format(" | Runs: %d", status.runsCompleted)
+    if isRaid then
+        -- For raids, show size and location instead of faction/rep
+        factionText = string.format("%d-man | %s",
+            data.size,
+            data.location or "Unknown"
+        )
+    else
+        -- For dungeons, show faction and rep info
+        factionText = string.format("%s | %s / %s",
+            data.faction,
+            status.factionStanding or "Unknown",
+            data.repCap
+        )
+
+        if status.runsCompleted > 0 then
+            factionText = factionText .. string.format(" | Runs: %d", status.runsCompleted)
+        end
+
+        -- Add rep and exp per run
+        factionText = factionText .. string.format(" | Rep: %d  XP: %s",
+            data.repPerRun or 0,
+            data.expPerRun and string.format("%.1fk", data.expPerRun / 1000) or "0"
+        )
     end
-
-    -- Add rep and exp per run
-    factionText = factionText .. string.format(" | Rep: %d  XP: %s",
-        data.repPerRun or 0,
-        data.expPerRun and string.format("%.1fk", data.expPerRun / 1000) or "0"
-    )
 
     self.factionInfo:SetText(factionText)
 
     -- Set stats info
     local statsText = ""
-    if status.runsToRepCap > 0 then
-        statsText = string.format("~%d runs to cap", status.runsToRepCap)
-    elseif status.status == "COMPLETE" then
-        statsText = "Rep Capped"
+    if isRaid then
+        -- For raids, show attunement info if available
+        if data.attunement and data.attunement ~= "None" then
+            statsText = "Attunement: " .. data.attunement
+        else
+            statsText = "No attunement required"
+        end
+    else
+        -- For dungeons, show rep progress
+        if status.runsToRepCap > 0 then
+            statsText = string.format("~%d runs to cap", status.runsToRepCap)
+        elseif status.status == "COMPLETE" then
+            statsText = "Rep Capped"
+        end
     end
 
     self.statsInfo:SetText(statsText)

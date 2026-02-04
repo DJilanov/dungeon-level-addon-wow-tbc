@@ -612,14 +612,395 @@ L.Dungeons = {
     }
 }
 
+-- Raid loot information
+-- Note: Raids only have normal mode (no heroic) in TBC
+-- Format: {bossName, itemCount, items = {itemIDs}}
+L.Raids = {
+    ["Karazhan"] = {
+        atlasLootID = "Karazhan",
+        instanceID = 532,
+        size = 10,
+        bosses = {
+            {
+                name = "Attumen the Huntsman",
+                npcID = 16152,
+                itemCount = 14,
+                items = {28477, 28507, 28508, 28453, 28506, 28503, 28454, 28502, 28505, 28509, 28510, 28504, 30480, 23809}
+            },
+            {
+                name = "Moroes",
+                npcID = 15687,
+                itemCount = 12,
+                items = {28529, 28570, 28565, 28545, 28567, 28566, 28569, 28530, 28528, 28525, 28568, 28524, 22559}
+            },
+            {
+                name = "Maiden of Virtue",
+                npcID = 16457,
+                itemCount = 12,
+                items = {28511, 28515, 28517, 28514, 28521, 28520, 28519, 28512, 28518, 28516, 28523, 28522}
+            },
+            {
+                name = "Opera Event",
+                npcID = 0,  -- Multiple possible bosses
+                itemCount = 10,
+                items = {28594, 28591, 28589, 28593, 28590, 28592}  -- Shared drops across all 3 opera events
+            },
+            {
+                name = "The Curator",
+                npcID = 15691,
+                itemCount = 9,
+                items = {28612, 28647, 28631, 28621, 28649, 28633, 29757, 29758, 29756}
+            },
+            {
+                name = "Shade of Aran",
+                npcID = 16524,
+                itemCount = 13,
+                items = {28672, 28726, 28670, 28663, 28669, 28671, 28666, 23933, 28674, 28675, 28727, 28728, 28673, 22560}
+            },
+            {
+                name = "Terestian Illhoof",
+                npcID = 15688,
+                itemCount = 12,
+                items = {28660, 28653, 28652, 28654, 28655, 28656, 28662, 28661, 28785, 28657, 28658, 28659, 22561}
+            },
+            {
+                name = "Netherspite",
+                npcID = 15689,
+                itemCount = 12,
+                items = {28744, 28742, 28732, 28741, 28735, 28740, 28743, 28733, 28731, 28730, 28734, 28729}
+            },
+            {
+                name = "Chess Event",
+                npcID = 0,  -- Event, not NPC
+                itemCount = 12,
+                items = {28756, 28755, 28750, 28752, 28751, 28746, 28748, 28747, 28745, 28753, 28749, 28754}
+            },
+            {
+                name = "Prince Malchezaar",
+                npcID = 15690,
+                itemCount = 15,
+                items = {28765, 28766, 28764, 28762, 28763, 28757, 28770, 28768, 28767, 28773, 28771, 28772, 29760, 29761, 29759}
+            },
+            {
+                name = "Nightbane",
+                npcID = 17225,
+                itemCount = 14,
+                items = {28602, 28600, 28601, 28599, 28610, 28597, 28608, 31751, 24139, 28609, 28603, 28604, 28611, 28606}
+            },
+        }
+    },
+    ["Gruul's Lair"] = {
+        atlasLootID = "GruulsLair",
+        instanceID = 565,
+        size = 25,
+        bosses = {
+            {
+                name = "High King Maulgar",
+                npcID = 18831,
+                itemCount = 9,
+                items = {28797, 28799, 28796, 28801, 28795, 28800, 29763, 29764, 29762}
+            },
+            {
+                name = "Gruul the Dragonkiller",
+                npcID = 19044,
+                itemCount = 17,
+                items = {28804, 28803, 28828, 28827, 28810, 28824, 28822, 28823, 28830, 31750, 29766, 29767, 29765, 28802, 28794, 28825, 28826}
+            },
+        }
+    },
+    ["Magtheridon's Lair"] = {
+        atlasLootID = "MagtheridonsLair",
+        instanceID = 544,
+        size = 25,
+        bosses = {
+            {
+                name = "Magtheridon",
+                npcID = 17257,
+                itemCount = 18,
+                items = {28777, 28780, 28776, 28778, 28775, 28779, 28789, 28781, 28774, 28782, 29458, 28783, 29754, 29753, 29755, 32385, 34845, 34846}
+            },
+        }
+    },
+    ["Serpentshrine Cavern"] = {
+        atlasLootID = "SerpentshrineCavern",
+        instanceID = 548,
+        size = 25,
+        bosses = {
+            {
+                name = "Hydross the Unstable",
+                npcID = 21216,
+                itemCount = 14,
+                items = {30056, 32516, 30050, 30055, 30047, 30054, 30048, 30053, 30052, 33055, 30664, 30629, 30049, 30051}
+            },
+            {
+                name = "The Lurker Below",
+                npcID = 21217,
+                itemCount = 13,
+                items = {30064, 30067, 30062, 30060, 30066, 30065, 30057, 30059, 30061, 33054, 30665, 30063, 30058}
+            },
+            {
+                name = "Leotheras the Blind",
+                npcID = 21215,
+                itemCount = 9,
+                items = {30092, 30097, 30091, 30096, 30627, 30095, 30239, 30240, 30241}
+            },
+            {
+                name = "Fathom-Lord Karathress",
+                npcID = 21214,
+                itemCount = 9,
+                items = {30100, 30101, 30099, 30663, 30626, 30090, 30245, 30246, 30247}
+            },
+            {
+                name = "Morogrim Tidewalker",
+                npcID = 21213,
+                itemCount = 13,
+                items = {30098, 30079, 30075, 30085, 30068, 30084, 30081, 30008, 30083, 33058, 30720, 30082, 30080}
+            },
+            {
+                name = "Lady Vashj",
+                npcID = 21212,
+                itemCount = 16,
+                items = {30107, 30111, 30106, 30104, 30102, 30112, 30109, 30110, 30621, 30103, 30108, 30105, 30242, 30243, 30244, 29906}
+            },
+        }
+    },
+    ["Tempest Keep"] = {
+        atlasLootID = "TempestKeep",
+        instanceID = 550,
+        size = 25,
+        bosses = {
+            {
+                name = "Al'ar",
+                npcID = 19514,
+                itemCount = 13,
+                items = {29925, 29918, 29947, 29921, 29922, 29920, 30448, 30447, 29923, 32944, 29948, 29924, 29949}
+            },
+            {
+                name = "Void Reaver",
+                npcID = 19516,
+                itemCount = 10,
+                items = {29986, 29984, 29985, 29983, 32515, 30619, 30450, 30248, 30249, 30250}
+            },
+            {
+                name = "High Astromancer Solarian",
+                npcID = 18805,
+                itemCount = 13,
+                items = {29977, 29972, 29966, 29976, 29951, 29965, 29950, 32267, 30446, 30449, 29962, 29981, 29982}
+            },
+            {
+                name = "Kael'thas Sunstrider",
+                npcID = 19622,
+                itemCount = 18,
+                items = {29992, 29989, 29994, 29990, 29987, 29995, 29991, 29998, 29997, 29993, 29996, 29988, 30236, 30237, 30238, 32458, 32405, 29905}
+            },
+        }
+    },
+    ["Battle for Mount Hyjal"] = {
+        atlasLootID = "HyjalSummit",
+        instanceID = 534,
+        size = 25,
+        bosses = {
+            {
+                name = "Rage Winterchill",
+                npcID = 17767,
+                itemCount = 13,
+                items = {30871, 30870, 30863, 30868, 30864, 30869, 30873, 30866, 30862, 30861, 30865, 30872, 32459}
+            },
+            {
+                name = "Anetheron",
+                npcID = 17808,
+                itemCount = 12,
+                items = {30884, 30888, 30885, 30879, 30886, 30887, 30880, 30878, 30874, 30881, 30883, 30882}
+            },
+            {
+                name = "Kaz'rogal",
+                npcID = 17888,
+                itemCount = 12,
+                items = {30895, 30916, 30894, 30917, 30914, 30891, 30892, 30919, 30893, 30915, 30918, 30889}
+            },
+            {
+                name = "Azgalor",
+                npcID = 17842,
+                itemCount = 9,
+                items = {30899, 30898, 30900, 30896, 30897, 30901, 31092, 31094, 31093}
+            },
+            {
+                name = "Archimonde",
+                npcID = 17968,
+                itemCount = 15,
+                items = {30913, 30912, 30905, 30907, 30904, 30903, 30911, 30910, 30902, 30908, 30909, 30906, 31097, 31095, 31096}
+            },
+        }
+    },
+    ["Black Temple"] = {
+        atlasLootID = "BlackTemple",
+        instanceID = 564,
+        size = 25,
+        bosses = {
+            {
+                name = "High Warlord Naj'entus",
+                npcID = 22887,
+                itemCount = 14,
+                items = {32239, 32240, 32377, 32241, 32234, 32242, 32232, 32243, 32245, 32238, 32247, 32237, 32236, 32248}
+            },
+            {
+                name = "Supremus",
+                npcID = 22898,
+                itemCount = 12,
+                items = {32256, 32252, 32259, 32251, 32258, 32250, 32260, 32261, 32257, 32254, 32262, 32255, 32253}
+            },
+            {
+                name = "Shade of Akama",
+                npcID = 22841,
+                itemCount = 14,
+                items = {32273, 32270, 32513, 32265, 32271, 32264, 32275, 32276, 32279, 32278, 32263, 32268, 32266, 32361}
+            },
+            {
+                name = "Teron Gorefiend",
+                npcID = 22871,
+                itemCount = 12,
+                items = {32323, 32329, 32327, 32324, 32328, 32510, 32280, 32512, 32330, 32348, 32326, 32325}
+            },
+            {
+                name = "Gurtogg Bloodboil",
+                npcID = 22948,
+                itemCount = 13,
+                items = {32337, 32338, 32340, 32339, 32334, 32342, 32333, 32341, 32335, 32501, 32269, 32344, 32343}
+            },
+            {
+                name = "Reliquary of Souls",
+                npcID = 22856,
+                itemCount = 13,
+                items = {32353, 32351, 32347, 32352, 32517, 32346, 32354, 32345, 32349, 32362, 32350, 32332, 32363}
+            },
+            {
+                name = "Mother Shahraz",
+                npcID = 22947,
+                itemCount = 9,
+                items = {32367, 32366, 32365, 32370, 32368, 32369, 31101, 31103, 31102}
+            },
+            {
+                name = "Illidari Council",
+                npcID = 23426,
+                itemCount = 9,
+                items = {32331, 32519, 32518, 32376, 32373, 32505, 31098, 31100, 31099}
+            },
+            {
+                name = "Illidan Stormrage",
+                npcID = 22917,
+                itemCount = 17,
+                items = {32524, 32525, 32235, 32521, 32497, 32483, 32496, 32837, 32838, 31089, 31091, 31090, 32471, 32500, 32374, 32375, 32336}
+            },
+        }
+    },
+    ["Zul'Aman"] = {
+        atlasLootID = "ZulAman",
+        instanceID = 568,
+        size = 10,
+        bosses = {
+            {
+                name = "Akil'zon",
+                npcID = 23574,
+                itemCount = 9,
+                items = {29434, 33286, 33215, 33216, 33281, 33293, 33214, 33283, 33307}
+            },
+            {
+                name = "Nalorakk",
+                npcID = 23576,
+                itemCount = 9,
+                items = {29434, 33203, 33285, 33211, 33206, 33327, 33191, 33640, 33307}
+            },
+            {
+                name = "Jan'alai",
+                npcID = 23578,
+                itemCount = 9,
+                items = {29434, 33357, 33356, 33329, 33328, 33354, 33326, 33332, 33307}
+            },
+            {
+                name = "Halazzi",
+                npcID = 23577,
+                itemCount = 9,
+                items = {29434, 33317, 33300, 33322, 33533, 33299, 33303, 33297, 33307}
+            },
+            {
+                name = "Hex Lord Malacrass",
+                npcID = 24239,
+                itemCount = 16,
+                items = {29434, 33592, 33453, 33463, 33432, 33464, 33421, 33446, 33307, 33829, 34029, 33828, 33389, 33298, 33388, 33465}
+            },
+            {
+                name = "Zul'jin",
+                npcID = 23863,
+                itemCount = 15,
+                items = {29434, 33471, 33479, 33469, 33473, 33466, 33830, 33831, 33307, 33467, 33478, 33476, 33468, 33474, 33102}
+            },
+        }
+    },
+    ["Sunwell Plateau"] = {
+        atlasLootID = "SunwellPlateau",
+        instanceID = 580,
+        size = 25,
+        bosses = {
+            {
+                name = "Kalecgos",
+                npcID = 24850,
+                itemCount = 10,
+                items = {34170, 34169, 34168, 34167, 34166, 34848, 34851, 34852, 34165, 34164}
+            },
+            {
+                name = "Brutallus",
+                npcID = 24882,
+                itemCount = 9,
+                items = {34181, 34180, 34178, 34177, 34853, 34854, 34855, 34176, 34179}
+            },
+            {
+                name = "Felmyst",
+                npcID = 25038,
+                itemCount = 9,
+                items = {34352, 34188, 34186, 34184, 34856, 34857, 34858, 34182, 34185}
+            },
+            {
+                name = "Eredar Twins",
+                npcID = 25166,
+                itemCount = 21,
+                items = {34205, 34190, 34210, 34202, 34209, 34195, 34194, 34208, 34192, 34193, 35290, 35291, 35292, 34204, 34189, 34206, 34197, 34199, 34203, 34198, 34196}
+            },
+            {
+                name = "M'uru",
+                npcID = 25741,
+                itemCount = 21,
+                items = {34232, 34233, 34212, 34211, 34234, 34229, 34228, 34215, 34240, 34216, 34213, 34230, 35282, 35283, 35284, 34427, 34430, 34429, 34428, 34214, 34231}
+            },
+            {
+                name = "Kil'jaeden",
+                npcID = 25315,
+                itemCount = 21,
+                items = {34241, 34242, 34339, 34340, 34342, 34344, 34244, 34245, 34333, 34332, 34343, 34243, 34345, 34341, 34334, 34329, 34247, 34335, 34331, 34336, 34337}
+            },
+        }
+    }
+}
+
 -- Get loot data for a dungeon
 function L:GetDungeonLoot(dungeonName)
     return self.Dungeons[dungeonName]
 end
 
+-- Get loot data for a raid
+function L:GetRaidLoot(raidName)
+    return self.Raids[raidName]
+end
+
 -- Get boss list for a dungeon
 function L:GetBossList(dungeonName)
     local data = self.Dungeons[dungeonName]
+    if not data then return {} end
+    return data.bosses
+end
+
+-- Get boss list for a raid
+function L:GetRaidBossList(raidName)
+    local data = self.Raids[raidName]
     if not data then return {} end
     return data.bosses
 end
@@ -636,6 +1017,18 @@ function L:GetTotalLoot(dungeonName, difficulty)
         else
             total = total + (boss.normal or 0)
         end
+    end
+    return total
+end
+
+-- Get total loot count for a raid
+function L:GetRaidTotalLoot(raidName)
+    local data = self.Raids[raidName]
+    if not data then return 0 end
+
+    local total = 0
+    for _, boss in ipairs(data.bosses) do
+        total = total + (boss.itemCount or 0)
     end
     return total
 end

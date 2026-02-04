@@ -13,6 +13,7 @@ R.Raids = {
         minLevel = 70,
         attunement = "Required: Key to Karazhan (quest chain)",
         location = "Deadwind Pass",
+        image = "Textures\\karazhan.tga",
         bosses = {
             "Attumen the Huntsman",
             "Moroes",
@@ -40,6 +41,7 @@ R.Raids = {
         minLevel = 70,
         attunement = "None",
         location = "Blade's Edge Mountains",
+        image = "Textures\\gruuls.tga",
         bosses = {
             "High King Maulgar",
             "Gruul the Dragonkiller",
@@ -59,6 +61,7 @@ R.Raids = {
         minLevel = 70,
         attunement = "None",
         location = "Hellfire Citadel",
+        image = "Textures\\magtheridons.tga",
         bosses = {
             "Magtheridon",
         },
@@ -77,6 +80,7 @@ R.Raids = {
         minLevel = 70,
         attunement = "Required: Vial of Blessed Water",
         location = "Coilfang Reservoir, Zangarmarsh",
+        image = "Textures\\SSC.tga",
         bosses = {
             "Hydross the Unstable",
             "The Lurker Below",
@@ -99,6 +103,7 @@ R.Raids = {
         minLevel = 70,
         attunement = "Required: The Eye attunement",
         location = "Netherstorm",
+        image = "Textures\\tempest-keep.tga",
         bosses = {
             "Al'ar",
             "Void Reaver",
@@ -119,6 +124,7 @@ R.Raids = {
         minLevel = 70,
         attunement = "Required: Vials of Eternity",
         location = "Caverns of Time, Tanaris",
+        image = "Textures\\hyial.tga",
         bosses = {
             "Rage Winterchill",
             "Anetheron",
@@ -140,6 +146,7 @@ R.Raids = {
         minLevel = 70,
         attunement = "Required: Medallion of Karabor",
         location = "Shadowmoon Valley",
+        image = "Textures\\black-temple.tga",
         bosses = {
             "High Warlord Naj'entus",
             "Supremus",
@@ -165,6 +172,7 @@ R.Raids = {
         minLevel = 70,
         attunement = "None",
         location = "Ghostlands",
+        image = "Textures\\zul-aman.tga",
         bosses = {
             "Nalorakk (Bear)",
             "Akil'zon (Eagle)",
@@ -187,6 +195,7 @@ R.Raids = {
         minLevel = 70,
         attunement = "None (in later phases)",
         location = "Isle of Quel'Danas",
+        image = "Textures\\sunwell_plateau.tga",
         bosses = {
             "Kalecgos",
             "Brutallus",
@@ -215,7 +224,11 @@ function R:GetOrderedRaids()
     for name, data in pairs(self.Raids) do
         table.insert(ordered, {name = name, data = data})
     end
-    table.sort(ordered, function(a, b) return a.data.order < b.data.order end)
+    table.sort(ordered, function(a, b)
+        local orderA = a.data.order or 0
+        local orderB = b.data.order or 0
+        return orderA < orderB
+    end)
     return ordered
 end
 

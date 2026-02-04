@@ -4,17 +4,17 @@
 
 # DJ Dungeon Spam Guide
 
-**The ultimate leveling companion for World of Warcraft's 20th Anniversary TBC phase!**
+**The ultimate leveling and endgame companion for World of Warcraft's 20th Anniversary TBC phase!**
 
-Master the art of dungeon spam leveling from 60-70 with intelligent recommendations, comprehensive loot guides, and real-time reputation tracking. Never wonder which dungeon to run next!
+Master the art of dungeon spam leveling from 60-70 with intelligent recommendations, comprehensive loot guides, and real-time reputation tracking. Ready for raids? Browse all 9 TBC raids with detailed boss strategies and loot information. Never wonder which dungeon to run or which raid to tackle next!
 
 ---
 
 ## 🎯 What Does This Addon Do?
 
-DJ Dungeon Spam Guide analyzes your character's level, reputation, and progression to **automatically recommend the optimal dungeon** for your next run. It tracks your progress across all 15 TBC dungeons and 6 factions, helping you maximize XP gains, reputation, and loot efficiency.
+DJ Dungeon Spam Guide analyzes your character's level, reputation, and progression to **automatically recommend the optimal dungeon** for your next run. It tracks your progress across all 15 TBC dungeons, 6 factions, and provides comprehensive information for all 9 TBC raids with boss strategies, abilities, and loot tables.
 
-Whether you're a fresh level 60 stepping through the Dark Portal or a seasoned level 70 farming your last Exalted reputation, this addon has you covered!
+Whether you're a fresh level 60 stepping through the Dark Portal, a seasoned level 70 farming your last Exalted reputation, or preparing for your first Karazhan run, this addon has you covered!
 
 ---
 
@@ -29,15 +29,17 @@ Whether you're a fresh level 60 stepping through the Dark Portal or a seasoned l
 ### 📊 Comprehensive Tracking
 - **Real-Time Updates**: Automatic tracking of dungeon runs, XP gains, and reputation changes
 - **All 15 TBC Dungeons**: From Hellfire Ramparts to Black Morass
+- **All 9 TBC Raids**: Karazhan, Gruul's Lair, Magtheridon's Lair, Serpentshrine Cavern, Tempest Keep, Mount Hyjal, Black Temple, Zul'Aman, and Sunwell Plateau
 - **6 Faction Progress Bars**: Visual tracking for Honor Hold, Cenarion Expedition, Lower City, Keepers of Time, The Sha'tar, and The Consortium
 - **Statistics Dashboard**: See your total runs, time invested, and progression at a glance
 
 ### 🗺️ Interactive Maps & Guides
 - **Outland Overview Map**: See all dungeon locations with level ranges
 - **Individual Dungeon Maps**: Detailed layouts for each instance
-- **Boss Loot Tables**: Know what drops before you run
-- **Boss Abilities & Strategies**: Quick reference for mechanics and tactics
-- **Location Information**: Zone, entrance location, and requirements
+- **Raid Boss Strategies**: Complete boss guides for all 9 TBC raids with abilities, health, and tactics
+- **Boss Loot Tables**: Know what drops before you run dungeons or raids
+- **Boss Abilities & Strategies**: Quick reference for mechanics and tactics for both dungeons and raids
+- **Location Information**: Zone, entrance location, requirements, and attunements
 
 ### 🎨 Beautiful Interface
 - **Clean, Modern UI**: Blizzard-style frames that match the game's aesthetic
@@ -171,6 +173,36 @@ All heroic keys require **Honored** reputation with the respective faction.
 
 ---
 
+## 🏆 TBC Raid Progression
+
+The addon includes comprehensive information for all 9 TBC raids:
+
+### Entry-Level Raids (T4)
+- **Karazhan** (10-man) - Requires: Key to Karazhan attunement
+- **Gruul's Lair** (25-man) - No attunement required
+- **Magtheridon's Lair** (25-man) - No attunement required
+
+### Tier 5 Raids
+- **Serpentshrine Cavern** (25-man) - Requires: SSC attunement chain
+- **Tempest Keep** (25-man) - Requires: The Eye attunement
+
+### Tier 6 Raids
+- **Battle for Mount Hyjal** (25-man) - Requires: Vials of Eternity (SSC/TK completion)
+- **Black Temple** (25-man) - Requires: Medallion of Karabor attunement
+
+### Catch-Up & Final Raids
+- **Zul'Aman** (10-man) - No attunement, timed run for mount
+- **Sunwell Plateau** (25-man) - No attunement in later phases, hardest content
+
+**Each raid includes**:
+- Complete boss strategies with abilities and mechanics
+- Health and mana values for all bosses
+- Loot table information
+- Location and attunement requirements
+- Strategic tips for each encounter
+
+---
+
 ## 🔧 Frequently Asked Questions
 
 **Q: Does this work for Horde?**
@@ -185,6 +217,9 @@ A: The addon automatically tracks dungeon entries. Manual marking is coming soon
 **Q: Does this work with other leveling addons?**
 A: Yes! DJ Dungeon Spam Guide is designed to work alongside other addons.
 
+**Q: Does the addon include raid information?**
+A: Yes! The addon includes comprehensive information for all 9 TBC raids, including boss strategies, abilities, health pools, loot tables, and attunement requirements. Simply click the "Raids" button in the main interface to browse all available raids.
+
 **Q: I found a bug, where do I report it?**
 A: Join the [Discord](https://discord.gg/v8BVn9qf) and message **KFC Spineshatter**, report on [GitHub Issues](https://github.com/DJilanov/ally-level-addon-wow-tbc/issues), or leave a comment below!
 
@@ -195,9 +230,10 @@ A: Join the [Discord](https://discord.gg/v8BVn9qf) and message **KFC Spineshatte
 ✅ Players leveling from 60-70 in TBC
 ✅ Dungeon spam enthusiasts
 ✅ Reputation farmers
-✅ Anyone preparing for heroics
+✅ Anyone preparing for heroics or raids
+✅ Raiders looking for boss strategies and loot information
 ✅ Min-max levelers who want optimal routes
-✅ Groups organizing dungeon runs
+✅ Groups organizing dungeon or raid runs
 
 ---
 
@@ -223,6 +259,15 @@ Found a bug or have a suggestion? Let me know!
 ---
 
 ## 📝 Changelog
+
+### Version 1.1.0 (In Development)
+- **NEW: Full TBC Raid Coverage** - Added all 9 TBC raids with comprehensive information
+- Detailed boss strategies for every raid encounter
+- Boss abilities, health pools, and mechanics for all raid bosses
+- Raid location and attunement requirements
+- Loot table structure for all raids
+- Dedicated "Raids" view in the main interface
+- Boss strategies optimized for both 10-man and 25-man raids
 
 ### Version 1.0.0
 - Initial release

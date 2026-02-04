@@ -4,10 +4,17 @@
       "Bash(git fetch:*)",
       "Read(//Applications/World of Warcraft/**)",
       "WebFetch(domain:raw.githubusercontent.com)",
-      "Read(//Applications/**)"
+      "Read(//Applications/**)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(/usr/bin/grep -n \"^\\\\[\"\"\" Data/RaidData.lua)",
+      "Bash(/usr/bin/grep -n \"order = \" Data/RaidData.lua)",
+      "Bash(lua:*)"
     ],
     "additionalDirectories": [
-      "/Users/dimitarjilanov/work/test/level-planner/DJDungeonSpamGuide/Textures"
+      "/Users/dimitarjilanov/work/test/level-planner/DJDungeonSpamGuide/Textures",
+      "/Users/dimitarjilanov/Downloads/tbc raids"
     ]
   }
 }

@@ -13,22 +13,20 @@ Addon.EventFrame = EventFrame
 local isInDungeon = false
 local currentDungeon = nil
 local lastZone = nil
+local isLoggingOut = false
 
--- Initialize events
+-- Initialize events (no longer used - see bottom of file for event registration)
 function EventFrame:Init()
-    self:RegisterEvent("ADDON_LOADED")
-    self:RegisterEvent("PLAYER_ENTERING_WORLD")
-    self:RegisterEvent("ZONE_CHANGED_NEW_AREA")
-    self:RegisterEvent("UPDATE_FACTION")
-    self:RegisterEvent("PLAYER_XP_UPDATE")
-    self:RegisterEvent("PLAYER_LEVEL_UP")
-    self:RegisterEvent("CHAT_MSG_SYSTEM")
-
-    self:SetScript("OnEvent", self.OnEvent)
+    -- Deprecated - events are now registered at file load to prevent taint
 end
 
 -- Main event handler
 function EventFrame:OnEvent(event, ...)
+    -- Stop processing events if logging out to avoid UI taint
+    if isLoggingOut and event ~= "PLAYER_LOGOUT" then
+        return
+    end
+
     if event == "ADDON_LOADED" then
         self:OnAddonLoaded(...)
     elseif event == "PLAYER_ENTERING_WORLD" then
@@ -43,6 +41,12 @@ function EventFrame:OnEvent(event, ...)
         self:OnLevelUp(...)
     elseif event == "CHAT_MSG_SYSTEM" then
         self:OnSystemMessage(...)
+    elseif event == "PLAYER_LOGOUT" then
+        isLoggingOut = true
+        -- Hide UI to prevent taint issues
+        if Addon.MainFrame then
+            Addon.MainFrame:Hide()
+        end
     end
 end
 
@@ -50,35 +54,33 @@ end
 function EventFrame:OnAddonLoaded(loadedAddon)
     if loadedAddon ~= ADDON_NAME then return end
 
-    -- Initialize database
-    Addon:InitializeDB()
+    -- Delay ALL initialization to avoid taint
+    C_Timer.After(1, function()
+        -- Initialize database
+        Addon:InitializeDB()
 
-    -- Initialize modules
-    if Addon.Tracker then
-        Addon.Tracker:Init()
-    end
-    if Addon.Recommender then
-        Addon.Recommender:Init()
-    end
-    if Addon.ZoneDetection then
-        Addon.ZoneDetection:Init()
-    end
+        -- Initialize modules
+        if Addon.Tracker then
+            Addon.Tracker:Init()
+        end
+        if Addon.Recommender then
+            Addon.Recommender:Init()
+        end
+        if Addon.ZoneDetection then
+            Addon.ZoneDetection:Init()
+        end
 
-    -- Initialize UI
-    if DST.MinimapButton then
-        DST.MinimapButton:Init()
-    end
+        -- Initialize minimap button
+        if DST.MinimapButton then
+            DST.MinimapButton:Init()
+        end
 
-    -- Create main frame (but don't show it)
-    if Addon.CreateMainFrame then
-        Addon:CreateMainFrame()
-    end
-
-    -- Show welcome message on first login
-    if Addon.charDB and Addon.charDB.firstLogin then
-        Addon:Print(L["ADDON_LOADED"])
-        Addon.charDB.firstLogin = false
-    end
+        -- Show welcome message on first login
+        if Addon.charDB and Addon.charDB.firstLogin then
+            Addon:Print(L["ADDON_LOADED"])
+            Addon.charDB.firstLogin = false
+        end
+    end)
 
     -- Unregister this event
     self:UnregisterEvent("ADDON_LOADED")
@@ -167,9 +169,9 @@ function EventFrame:OnFactionUpdate()
         Addon.Tracker:RefreshReputation()
     end
 
-    -- Update UI if visible
+    -- Update UI if visible (use pcall to prevent taint)
     if Addon.MainFrame and Addon.MainFrame:IsShown() then
-        Addon.MainFrame:Refresh()
+        pcall(function() Addon.MainFrame:Refresh() end)
     end
 end
 
@@ -179,9 +181,9 @@ function EventFrame:OnXPUpdate()
         Addon.Tracker:RefreshXP()
     end
 
-    -- Update UI if visible
+    -- Update UI if visible (use pcall to prevent taint)
     if Addon.MainFrame and Addon.MainFrame:IsShown() then
-        Addon.MainFrame:RefreshHeader()
+        pcall(function() Addon.MainFrame:RefreshHeader() end)
     end
 end
 
@@ -209,5 +211,23 @@ function EventFrame:OnSystemMessage(msg)
     -- For TBC, we mainly track via zone changes
 end
 
--- Initialize
-EventFrame:Init()
+-- Register events after player enters world to avoid taint
+EventFrame:RegisterEvent("ADDON_LOADED")
+EventFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
+EventFrame:SetScript("OnEvent", function(self, event, ...)
+    if event == "ADDON_LOADED" and select(1, ...) == ADDON_NAME then
+        EventFrame:OnAddonLoaded(...)
+    elseif event == "PLAYER_ENTERING_WORLD" then
+        -- Now it's safe to register all events
+        EventFrame:UnregisterEvent("PLAYER_ENTERING_WORLD")
+        EventFrame:RegisterEvent("ZONE_CHANGED_NEW_AREA")
+        EventFrame:RegisterEvent("UPDATE_FACTION")
+        EventFrame:RegisterEvent("PLAYER_XP_UPDATE")
+        EventFrame:RegisterEvent("PLAYER_LEVEL_UP")
+        EventFrame:RegisterEvent("CHAT_MSG_SYSTEM")
+        EventFrame:RegisterEvent("PLAYER_LOGOUT")
+        -- Switch to full event handler
+        EventFrame:SetScript("OnEvent", EventFrame.OnEvent)
+        EventFrame:OnPlayerEnteringWorld(...)
+    end
+end)

@@ -673,86 +673,660 @@ function B:HasBossData(dungeonName, bossName)
     return self.Bosses[dungeonName] and self.Bosses[dungeonName][bossName] ~= nil
 end
 
--- TBC Raid Boss Lists
-B.Raids = {
+-- TBC Raid Boss Data
+-- Format: Same as dungeon bosses (health, mana, abilities, mechanics, notes)
+-- Note: Raids only have normal mode (no heroic) in TBC
+B.RaidBosses = {
     ["Karazhan"] = {
-        "Attumen the Huntsman",
-        "Midnight",
-        "Moroes",
-        "Maiden of Virtue",
-        "The Curator",
-        "Terestian Illhoof",
-        "Shade of Aran",
-        "Netherspite",
-        "Prince Malchezaar",
-        "Nightbane",
-        "Tenris Mirkblood",
-    },
-    ["Zul'Aman"] = {
-        "Nalorakk",
-        "Jan'alai",
-        "Akil'zon",
-        "Halazzi",
-        "Hexxlord Jin'Zakk",
-        "Zul'jin",
+        ["Attumen the Huntsman"] = {
+            health = {normal = "820,000"},
+            mana = {normal = nil},
+            abilities = {
+                {name = "Intangible Presence", desc = "Reduces healing on tank by 50% when mounted."},
+                {name = "Shadow Cleave", desc = "Frontal cone shadow damage hitting multiple targets."},
+                {name = "Charge", desc = "Charges random player and stuns them."},
+                {name = "Summon Midnight", desc = "Mounted phase - combines with Midnight at 95% HP."},
+            },
+            adds = "Midnight (horse) - merges with Attumen at 95%",
+            notes = "Tank faces boss away from raid. Two-phase fight: Kill Midnight first, then Attumen mounts and they combine into one entity."
+        },
+        ["Moroes"] = {
+            health = {normal = "535,000"},
+            mana = {normal = nil},
+            abilities = {
+                {name = "Gouge", desc = "Incapacitates main tank and switches to a new target."},
+                {name = "Blind", desc = "Blinds a random player."},
+                {name = "Garrote", desc = "Applies stacking bleed DOT that must be dispelled."},
+                {name = "Vanish", desc = "Disappears briefly then reappears with full energy."},
+                {name = "Enrage", desc = "At 30% HP, enrages increasing damage and attack speed."},
+            },
+            adds = "4 Dinner Guests (random each week) - must be CC'd or killed",
+            notes = "CRITICAL: CC 2 adds, off-tank 1-2 others. Dispel Garrote bleeds immediately. Tank swap ready for Gouge. Use bloodlust/heroism at 30% for burn phase."
+        },
+        ["Maiden of Virtue"] = {
+            health = {normal = "840,000"},
+            mana = {normal = "180,000"},
+            abilities = {
+                {name = "Repentance", desc = "AoE stun that incapacitates all players in melee range for 6 seconds."},
+                {name = "Holy Fire", desc = "Deals holy damage and applies a DOT to random target."},
+                {name = "Holy Ground", desc = "Standing in consecrated areas deals holy damage over time."},
+                {name = "Holy Wrath", desc = "Massive AoE holy damage when players use spells/abilities near her."},
+            },
+            notes = "CRITICAL: Stop all casting/abilities during Repentance or Holy Wrath will wipe the raid! Melee DPS stay behind boss. Dispel Holy Fire DOTs."
+        },
+        ["Opera Event"] = {
+            health = {normal = "Varies"},
+            mana = {normal = "Varies"},
+            abilities = {
+                {name = "Random Event", desc = "One of three: Big Bad Wolf, Romulo & Julianne, or Wizard of Oz"},
+            },
+            notes = "Random encounter that changes weekly. Wolf: Kite the Little Red Riding Hood. R&J: Kill both within 10 seconds. Oz: CC Roar, kill Tinhead, then Strawman, then Crone."
+        },
+        ["The Curator"] = {
+            health = {normal = "1,680,000"},
+            mana = {normal = "150,000"},
+            abilities = {
+                {name = "Evocation", desc = "Channels to restore mana - raid must burn DPS during this phase."},
+                {name = "Arcane Infusion", desc = "Increases spell damage taken by 50% stacking debuff."},
+                {name = "Hateful Bolt", desc = "Massive arcane damage on second-highest threat target."},
+                {name = "Summon Astral Flare", desc = "Spawns adds every 10 seconds that must be killed."},
+                {name = "Berserk", desc = "Enrages after 10 minutes, wiping raid."},
+            },
+            adds = "Astral Flare adds spawn every 10 seconds",
+            notes = "CRITICAL: Kill Astral Flares with ranged DPS while melee stays on boss. Off-tank takes Hateful Bolt. Burn boss hard during Evocation phases. 10 minute enrage timer."
+        },
+        ["Shade of Aran"] = {
+            health = {normal = "882,000"},
+            mana = {normal = "250,000"},
+            abilities = {
+                {name = "Fireball", desc = "Heavy fire damage on highest threat target."},
+                {name = "Arcane Missiles", desc = "Channeled spell hitting random targets - can be interrupted."},
+                {name = "Chains of Ice", desc = "Roots and damages a random player - must move to break."},
+                {name = "Flame Wreath", desc = "Places ring around 3 players - NEVER MOVE or raid wipes!"},
+                {name = "Blizzard", desc = "AoE frost damage covering outer ring - move to center."},
+                {name = "Dragon's Breath", desc = "Massive frontal cone fire attack during Blizzard phase."},
+                {name = "Mass Polymorph", desc = "Sheeps entire raid briefly at 40% HP."},
+                {name = "Summon Elementals", desc = "Summons 4 Water Elementals at 40% HP."},
+            },
+            adds = "4 Water Elementals spawn at 40% HP - must be killed",
+            notes = "CRITICAL: During Flame Wreath, affected players MUST NOT MOVE or entire raid dies! Move center during Blizzard but watch for Dragon's Breath. Kill elementals at 40%."
+        },
+        ["Terestian Illhoof"] = {
+            health = {normal = "935,000"},
+            mana = {normal = "200,000"},
+            abilities = {
+                {name = "Sacrifice", desc = "Chains a player in cage, dealing shadow damage over time."},
+                {name = "Shadow Bolt", desc = "Heavy shadow damage on random target."},
+                {name = "Summon Kilrek", desc = "Permanently summons demon add at pull."},
+                {name = "Summon Demonchains", desc = "Spawns adds that channel on sacrificed player."},
+            },
+            adds = "Kilrek (permanent demon) and Demon Chains (spawn during Sacrifice)",
+            notes = "Kill Demon Chains immediately when player is sacrificed. Off-tank holds Kilrek away from boss. Interrupt Shadow Bolts when possible."
+        },
+        ["Netherspite"] = {
+            health = {normal = "1,680,000"},
+            mana = {normal = nil},
+            abilities = {
+                {name = "Netherbreath", desc = "Frontal cone arcane damage."},
+                {name = "Void Zone", desc = "Creates void zones that deal shadow damage."},
+                {name = "Banish", desc = "Banish phase - all DPS stops, portals appear."},
+                {name = "Perseverance Beam", desc = "Red beam - tank stands in it to reduce boss damage."},
+                {name = "Serenity Beam", desc = "Blue beam - healer stands in it for mana regeneration."},
+                {name = "Dominance Beam", desc = "Green beam - DPS stands in it for increased damage."},
+            },
+            notes = "Complex mechanic: Alternate between Portal phase (manage beams by rotation) and Banish phase (burn boss, avoid void zones). Rotate beam assignments."
+        },
+        ["Prince Malchezaar"] = {
+            health = {normal = "1,260,000"},
+            mana = {normal = nil},
+            abilities = {
+                {name = "Shadow Nova", desc = "Massive AoE shadow damage - healers be ready."},
+                {name = "Enfeeble", desc = "Reduces 5 players' HP to 1 temporarily - don't take any damage!"},
+                {name = "Thrash", desc = "Extra attacks on tank."},
+                {name = "Summon Infernal", desc = "Phase 2: Summons Infernals that create fire zones."},
+                {name = "Summon Axes", desc = "Phase 3: Floating axes deal damage to random players."},
+            },
+            adds = "Phase 2: Infernals. Phase 3: Floating Axes",
+            notes = "Three phases. Phase 1: Basic tank and spank. Phase 2 (60%): Infernals drop creating fire - move away. Phase 3 (30%): Axes attack random players + Enfeeble - affected players take no damage."
+        },
+        ["Nightbane"] = {
+            health = {normal = "1,260,000"},
+            mana = {normal = nil},
+            abilities = {
+                {name = "Cleave", desc = "Frontal cone physical damage."},
+                {name = "Tail Sweep", desc = "Rear cone knockback."},
+                {name = "Charred Earth", desc = "Creates fire zones on ground - move out!"},
+                {name = "Distracting Ash", desc = "Reduces chance to hit by 75%."},
+                {name = "Air Phase", desc = "Flies into air shooting Fireball Barrages - hide behind walls."},
+                {name = "Smoking Blast", desc = "Frontal cone fire damage during air phase."},
+            },
+            adds = "Restless Skeletons spawn during Air phase",
+            notes = "Optional boss summoned via Blackened Urn. Two phases alternate: Ground (tank and spank with fire avoidance) and Air (hide behind walls, kill skeletons). Move from Charred Earth immediately."
+        },
     },
     ["Gruul's Lair"] = {
-        "High King Maulgar",
-        "Gruul the Dragonkiller",
+        ["High King Maulgar"] = {
+            health = {normal = "1,680,000"},
+            mana = {normal = nil},
+            abilities = {
+                {name = "Arcing Smash", desc = "Frontal cone attack hitting for massive damage."},
+                {name = "Whirlwind", desc = "Spinning AoE attack - everyone kite away."},
+                {name = "Intimidating Roar", desc = "Fears nearby players."},
+                {name = "Flurry", desc = "Increases attack speed significantly."},
+            },
+            adds = "4 Council Members: Kiggler (mage), Blindeye (warlock), Olm (priest), Krosh (warrior) - must be killed first",
+            notes = "CRITICAL: CC or off-tank each council member. Kill order: Blindeye > Kiggler > Krosh > Olm > Maulgar. Kite during Whirlwind. Face Maulgar away for Arcing Smash."
+        },
+        ["Gruul the Dragonkiller"] = {
+            health = {normal = "3,360,000"},
+            mana = {normal = nil},
+            abilities = {
+                {name = "Hurtful Strike", desc = "Hits second-highest threat target for massive damage."},
+                {name = "Cave In", desc = "Random falling rocks deal damage - keep moving."},
+                {name = "Ground Slam", desc = "AoE knockback that also applies Stoned debuff."},
+                {name = "Stoned", desc = "Stacking debuff reducing movement speed. At 5 stacks = Shatter."},
+                {name = "Shatter", desc = "Kills all players with 5 Stoned stacks instantly if within 15 yards of each other."},
+                {name = "Grow", desc = "Stacking buff increasing damage and size - soft enrage."},
+            },
+            notes = "CRITICAL: After each Ground Slam, spread out to prevent Shatter chain kills. Off-tank takes Hurtful Strike. Keep moving during Cave In. 9 minute soft enrage via Grow stacks."
+        },
     },
     ["Magtheridon's Lair"] = {
-        "Magtheridon",
+        ["Magtheridon"] = {
+            health = {normal = "4,200,000"},
+            mana = {normal = nil},
+            abilities = {
+                {name = "Cleave", desc = "Frontal cone physical damage."},
+                {name = "Blast Nova", desc = "5 second cast AoE that wipes raid - click cubes to interrupt!"},
+                {name = "Quake", desc = "Raid-wide damage pulse."},
+                {name = "Cave In", desc = "Random rocks fall dealing damage."},
+                {name = "Warder Debuff", desc = "If Hellfire Warders alive, they channel Shadow Grasp debuff."},
+            },
+            adds = "5 Hellfire Channelers at start, must be killed within 2 minutes",
+            notes = "CRITICAL: Kill all 5 Channelers quickly, interrupt their Dark Mending. When Magtheridon casts Blast Nova, 5 players must click Manticron Cubes to interrupt or raid wipes. Rotate cube clickers."
+        },
     },
     ["Serpentshrine Cavern"] = {
-        "Hydross the Unstable",
-        "The Lurker Below",
-        "Leotheras the Blind",
-        "Fathom-Lord Karathress",
-        "Morogrim Tidewalker",
-        "Lady Vashj",
+        ["Hydross the Unstable"] = {
+            health = {normal = "2,940,000"},
+            mana = {normal = nil},
+            abilities = {
+                {name = "Water Tomb", desc = "Encases random player in water bubble."},
+                {name = "Vile Sludge", desc = "Poison DOT that spreads to nearby players."},
+                {name = "Mark of Hydross/Corruption", desc = "Stacking debuff based on current form."},
+                {name = "Phase Transition", desc = "Switches between Frost (blue) and Nature (green) at 75%, 50%, 25%."},
+            },
+            notes = "Position boss near center. Tank swaps on phase transitions. DPS stops briefly during transition. Dispel Vile Sludge quickly. Spread out to prevent DOT spreading."
+        },
+        ["The Lurker Below"] = {
+            health = {normal = "2,520,000"},
+            mana = {normal = nil},
+            abilities = {
+                {name = "Spout", desc = "Spinning water stream that knocks players off platform - jump in water!"},
+                {name = "Whirl", desc = "AoE knockback during Spout."},
+                {name = "Geyser", desc = "Random water spouts knocking players up."},
+                {name = "Submerge", desc = "Boss goes underwater, spawning adds."},
+            },
+            adds = "Coilfang Ambusher and Guardian adds during Submerge phase",
+            notes = "CRITICAL: During Spout, everyone jump in water immediately or die. Kill adds during Submerge phase. Jump back on platform when boss resurfaces. Don't stand on geyser spawn points."
+        },
+        ["Leotheras the Blind"] = {
+            health = {normal = "2,310,000 combined"},
+            mana = {normal = "150,000"},
+            abilities = {
+                {name = "Whirlwind", desc = "Spinning AoE melee attack."},
+                {name = "Insidious Whisper", desc = "Mind controls a player who splits into demon - must be killed!"},
+                {name = "Chaos Blast", desc = "Shadow damage on random target."},
+                {name = "Demon Form Split", desc = "At 15% HP, splits into Demon and Human forms."},
+            },
+            adds = "Inner Demons spawn from mind-controlled players",
+            notes = "Complex fight. Kill Inner Demons from mind control quickly. At 15%, boss splits - kill both forms within 1 minute or they recombine with full HP. Kite during Whirlwind."
+        },
+        ["Fathom-Lord Karathress"] = {
+            health = {normal = "1,260,000"},
+            mana = {normal = nil},
+            abilities = {
+                {name = "Cataclysmic Bolt", desc = "Massive single-target damage on highest threat."},
+                {name = "Sear Nova", desc = "AoE fire damage."},
+                {name = "Enrage", desc = "Increases damage when advisors die."},
+            },
+            adds = "3 Advisors: Caribdis (priest), Tidalvess (hunter), Sharkkis (shaman) - kill first",
+            notes = "Kill order: Sharkkis > Tidalvess > Caribdis > Karathress. Each advisor death enrages Karathress. Off-tank each advisor. Interrupt Caribdis heals."
+        },
+        ["Morogrim Tidewalker"] = {
+            health = {normal = "4,200,000"},
+            mana = {normal = "115,000"},
+            abilities = {
+                {name = "Tidal Wave", desc = "Summons massive wave that knocks raid back and deals damage."},
+                {name = "Watery Grave", desc = "Encases 4 players in water tombs - raid must free them!"},
+                {name = "Earthquake", desc = "Raid-wide damage during Watery Grave phase."},
+                {name = "Summon Water Globule", desc = "Spawns adds that must be killed quickly."},
+            },
+            adds = "Murlocs at start (clear before pull), Water Globules during fight",
+            notes = "CRITICAL: Free players from Watery Graves quickly by destroying globes. Kill Water Globule adds immediately. Position raid to handle Tidal Wave knockback."
+        },
+        ["Lady Vashj"] = {
+            health = {normal = "5,040,000"},
+            mana = {normal = nil},
+            abilities = {
+                {name = "Shock Blast", desc = "Heavy nature damage on tank."},
+                {name = "Static Charge", desc = "Jumping lightning between nearby players - spread out!"},
+                {name = "Entangle", desc = "Roots random player in place."},
+                {name = "Phase 2: Shield", desc = "Becomes immune, raid must do Core Mechanic."},
+                {name = "Toxic Spore", desc = "Green poison clouds - don't stand in them."},
+                {name = "Tainted Core", desc = "P2: Enchanted Elementals drop cores - pass them to Core Looters."},
+            },
+            adds = "Phase 2: Strider adds and Enchanted Elementals. Phase 3: Naga adds",
+            notes = "Complex 3-phase fight. P1: Tank and spank, spread for Static Charge. P2: Kill Enchanted Elementals, carry Cores to generators (4 needed). P3: Burn boss, handle adds. Very coordination intensive."
+        },
     },
-    ["The Eye"] = {
-        "Al'ar",
-        "Void Reaver",
-        "High Astromancer Solarian",
-        "Kael'thas Sunstrider",
+    ["Tempest Keep"] = {
+        ["Al'ar"] = {
+            health = {normal = "3,570,000"},
+            mana = {normal = nil},
+            abilities = {
+                {name = "Flame Quills", desc = "Raid-wide fire damage while stationary."},
+                {name = "Flame Buffet", desc = "Stacking fire damage on tank."},
+                {name = "Dive Bomb", desc = "Charges random platform, dealing massive damage in area."},
+                {name = "Rebirth", desc = "At 0% HP Phase 1, resurrects as Al'ar in Phase 2."},
+                {name = "Melt Armor", desc = "Phase 2: Reduces tank armor by 80%."},
+            },
+            adds = "Ember of Al'ar adds in Phase 2 - must be killed",
+            notes = "Two phases. P1: Four platforms, boss flies between them. Tanks rotate on platforms. Move away from Dive Bomb. P2: Ember adds spawn - AoE them. Tank swap for Melt Armor."
+        },
+        ["Void Reaver"] = {
+            health = {normal = "4,200,000"},
+            mana = {normal = nil},
+            abilities = {
+                {name = "Arcane Orb", desc = "Massive arcane damage on random player + explosion around them."},
+                {name = "Pounding", desc = "Stacking knockback on tank."},
+                {name = "Knock Away", desc = "Knocks tank back and resets threat."},
+                {name = "Enrage", desc = "10 minute berserk timer."},
+            },
+            notes = "Simplest TBC raid boss - gear check. Stay spread 20+ yards for Arcane Orbs. Tank with back to wall. Off-tanks ready for Knock Away threat reset. 10 min enrage."
+        },
+        ["High Astromancer Solarian"] = {
+            health = {normal = "2,100,000"},
+            mana = {normal = "500,000"},
+            abilities = {
+                {name = "Arcane Missiles", desc = "Heavy arcane damage on random target."},
+                {name = "Wrath of the Astromancer", desc = "Massive arcane bomb on random player - RUN AWAY!"},
+                {name = "Blind", desc = "Blinds nearby players."},
+                {name = "Void Reaver Teleport", desc = "At 20%, teleports entire raid and spawns agents."},
+            },
+            adds = "3 Agents (Priests, Solarium Agents), Phase 2 Void Walkers",
+            notes = "Three phases. P1: Kill adds, avoid Wrath of Astromancer explosions (run 30+ yards away). P2 (50%): Becomes void form, spawns Void Walkers. P3 (20%): Spawns agents, burn boss."
+        },
+        ["Kael'thas Sunstrider"] = {
+            health = {normal = "8,400,000+"},
+            mana = {normal = nil},
+            abilities = {
+                {name = "Fireball", desc = "Heavy fire damage on tank."},
+                {name = "Shock Barrier", desc = "Stuns nearby players."},
+                {name = "Flamestrike", desc = "Fire AoE on ground - move out!"},
+                {name = "Phoenix", desc = "Summons Phoenix adds that resurrect if not killed quickly."},
+                {name = "Mind Control", desc = "Phase 4: Takes control of 3 players."},
+                {name = "Gravity Lapse", desc = "Phase 4: Levitates raid and deals damage."},
+            },
+            adds = "Phase 1: Four advisors + weapons. Phase 3: Phoenix. Phase 5: Multiple bosses",
+            notes = "LONGEST FIGHT IN TBC - 5 phases. P1: Kill 4 advisors. P2: Loot legendary weapons from advisors. P3: Fight Kael with weapons. P4: Mind controls and Gravity Lapse. P5: All advisors return - burn Kael."
+        },
     },
     ["Battle for Mount Hyjal"] = {
-        "Rage Winterchill",
-        "Anetheron",
-        "Kaz'rogal",
-        "Azgalor",
-        "Archimonde",
+        ["Rage Winterchill"] = {
+            health = {normal = "4,200,000"},
+            mana = {normal = "400,000"},
+            abilities = {
+                {name = "Frost Armor", desc = "Slows attackers."},
+                {name = "Death and Decay", desc = "AoE shadow DOT zones - move out!"},
+                {name = "Frost Nova", desc = "AoE freeze."},
+                {name = "Icebolt", desc = "Encases random player in ice block."},
+            },
+            notes = "Wave-based encounter. Defend Alliance base through waves of Horde attackers. Boss spawns after waves complete. Move from Death and Decay. Healers focus on dispelling."
+        },
+        ["Anetheron"] = {
+            health = {normal = "4,200,000"},
+            mana = {normal = "400,000"},
+            abilities = {
+                {name = "Carrion Swarm", desc = "Frontal cone shadow damage."},
+                {name = "Sleep", desc = "Puts nearby players to sleep."},
+                {name = "Vampiric Aura", desc = "Heals attackers for 3% of damage dealt."},
+                {name = "Inferno", desc = "Summons Infernal adds that must be tanked."},
+            },
+            adds = "Infernal adds - off-tank these away from raid",
+            notes = "Second wave boss. Tank with back to raid for Carrion Swarm. Off-tank Infernals away. Spread out to minimize Sleep."
+        },
+        ["Kaz'rogal"] = {
+            health = {normal = "4,200,000"},
+            mana = {normal = nil},
+            abilities = {
+                {name = "War Stomp", desc = "AoE stun and knockback."},
+                {name = "Cleave", desc = "Frontal cone melee attack."},
+                {name = "Mark of Kaz'rogal", desc = "Drains mana/rage/energy - if depleted, explodes for AoE damage!"},
+            },
+            notes = "Third wave boss. CRITICAL: Players marked must stop using abilities or risk explosion. Ranged spread out. Mana users stop casting when marked. Tank faces away."
+        },
+        ["Azgalor"] = {
+            health = {normal = "4,200,000"},
+            mana = {normal = nil},
+            abilities = {
+                {name = "Cleave", desc = "Frontal cone physical damage."},
+                {name = "War Stomp", desc = "AoE stun."},
+                {name = "Howl of Azgalor", desc = "AoE silence."},
+                {name = "Doom", desc = "Applies Doom debuff dealing massive shadow damage after 20 seconds - must be removed!"},
+            },
+            adds = "Summons Lesser Doomguard adds",
+            notes = "Fourth wave boss. Tank faces away. Kill Doomguard adds. CRITICAL: Dispel Doom or affected player dies instantly after 20 seconds!"
+        },
+        ["Archimonde"] = {
+            health = {normal = "8,400,000"},
+            mana = {normal = nil},
+            abilities = {
+                {name = "Air Burst", desc = "Launches random player into air - use Tears of the Goddess to survive fall!"},
+                {name = "Grip of the Legion", desc = "Beam that drains health/mana and fears."},
+                {name = "Doomfire", desc = "Creates spreading fire on ground - move out!"},
+                {name = "Fear", desc = "Random fears throughout fight."},
+                {name = "Soul Charge", desc = "Grows stronger when players die - battle res wisely!"},
+                {name = "Enrage", desc = "10 minute hard enrage."},
+            },
+            notes = "Final boss. CRITICAL: Use Tears of the Goddess item before pull (drops from tree) to survive Air Burst. Avoid Doomfire spreading. Don't die or boss gets stronger. 10 min enrage."
+        },
     },
-    ["The Black Temple"] = {
-        "High Warlord Naj'entus",
-        "Supremus",
-        "Shade of Akama",
-        "Teron Gorefiend",
-        "Gurtogg Bloodboil",
-        "Reliquary of Souls",
-        "Mother Shahraz",
-        "Illidari Council",
-        "Illidan Stormrage",
+    ["Black Temple"] = {
+        ["High Warlord Naj'entus"] = {
+            health = {normal = "5,040,000"},
+            mana = {normal = nil},
+            abilities = {
+                {name = "Impaling Spine", desc = "Impales random player with spine - raid must free them!"},
+                {name = "Tidal Shield", desc = "Absorbs damage, reflects when broken."},
+                {name = "Tidal Burst", desc = "Raid-wide frost damage when shield breaks."},
+                {name = "Needle Spine", desc = "Ranged attack on random targets."},
+            },
+            notes = "First boss. When Impaling Spine hits someone, raid must destroy spine to free them. Break Tidal Shield quickly, healers prepare for Tidal Burst. Spread out for Needle Spine."
+        },
+        ["Supremus"] = {
+            health = {normal = "6,720,000"},
+            mana = {normal = nil},
+            abilities = {
+                {name = "Molten Punch", desc = "Massive fire damage on tank with knockback."},
+                {name = "Volcanic Geyser", desc = "Random fire eruptions dealing AoE damage."},
+                {name = "Kite Phase", desc = "Switches to Kite Phase, chasing random player."},
+                {name = "Volcanic Eruption", desc = "During Kite Phase, creates fire patches."},
+            },
+            notes = "Two alternating phases. Tank Phase: Tank boss, move from Volcanic Geysers. Kite Phase: Targeted player kites boss, raid spreads and avoids volcanoes. Move between zones to reset."
+        },
+        ["Shade of Akama"] = {
+            health = {normal = "2,940,000"},
+            mana = {normal = nil},
+            abilities = {
+                {name = "Shadow of Death", desc = "Channeled attack that must be line-of-sighted."},
+                {name = "Adds", desc = "Constant waves of adds that must be managed."},
+            },
+            adds = "Channelers, Sorcerers, Spawns, and Defenders - endless waves",
+            notes = "Defensive encounter. Shade is initially immune. Kill 6 Channelers on sides first while managing add waves. Tank Akama helps. Once Channelers dead, Shade vulnerable - burn boss. Very add-heavy."
+        },
+        ["Teron Gorefiend"] = {
+            health = {normal = "6,300,000"},
+            mana = {normal = nil},
+            abilities = {
+                {name = "Shadow of Death", desc = "Kills a player, turning them into a ghost - must kill Vengeful Spirits!"},
+                {name = "Incinerate", desc = "Heavy fire damage on random target."},
+                {name = "Crushing Shadows", desc = "Debuff dealing shadow damage when healed."},
+                {name = "Doom Blossom", desc = "Creates shadow zones on ground."},
+            },
+            notes = "Complex mechanic: Random player becomes ghost and must kill constructs in spirit realm. Living raid damages boss while dodging shadow zones. Spread out. Don't heal Crushing Shadows targets."
+        },
+        ["Gurtogg Bloodboil"] = {
+            health = {normal = "7,560,000"},
+            mana = {normal = nil},
+            abilities = {
+                {name = "Bloodboil", desc = "Raid-wide bleed damage that stacks."},
+                {name = "Fel Acid Breath", desc = "Frontal cone acid attack."},
+                {name = "Arcing Smash", desc = "Frontal cone knockback."},
+                {name = "Fel Rage", desc = "Enrages on random raid member - they must be healed!"},
+                {name = "Eject", desc = "Knocks tank back and resets threat."},
+            },
+            notes = "Heal-intensive fight. Raid stacks for Bloodboil healing. Tank faces boss away. During Fel Rage, targeted player takes massive damage - all healers on them. Off-tanks ready for Eject."
+        },
+        ["Reliquary of Souls"] = {
+            health = {normal = "13,860,000 total"},
+            mana = {normal = nil},
+            abilities = {
+                {name = "Essence of Suffering", desc = "Phase 1 - Physical attacks, Fixate, Enrage."},
+                {name = "Essence of Desire", desc = "Phase 2 - Mana drains, Spirit Shock, Deaden."},
+                {name = "Essence of Anger", desc = "Phase 3 - Raid-wide aura, Soul Scream, Spite."},
+            },
+            notes = "Three-phase encounter, each with different mechanics. P1: Kite when Fixated, tank swap for Enrage. P2: Manage mana carefully, interrupt heals. P3: High DPS phase, spread for Spite. Very complex."
+        },
+        ["Mother Shahraz"] = {
+            health = {normal = "8,400,000"},
+            mana = {normal = nil},
+            abilities = {
+                {name = "Fatal Attraction", desc = "Teleports 3 players together - they explode for AoE damage!"},
+                {name = "Prismatic Aura", desc = "Random school immunity - raid needs all resist types."},
+                {name = "Saber Lash", desc = "Splits damage between 3 nearest targets - need 3 tanks!"},
+                {name = "Sinful Beam", desc = "Random debuffs on raid members."},
+                {name = "Enrage", desc = "10 minute berserk."},
+            },
+            notes = "Shadow resist fight. CRITICAL: 3 tanks must stack for Saber Lash or tank dies. Players with Fatal Attraction run away from raid. Need all resist types for Prismatic Aura. 10 min enrage."
+        },
+        ["Illidari Council"] = {
+            health = {normal = "2,100,000 each"},
+            mana = {normal = "Varies"},
+            abilities = {
+                {name = "Lady Malande", desc = "Healer - Reflective Shield, Circle of Healing."},
+                {name = "High Nethermancer Zerevor", desc = "Mage - Flamestrike, Blizzard, Arcane Bolt."},
+                {name = "Gathios the Shatterer", desc = "Paladin - Blessing of Spell Warding, Hammer of Justice."},
+                {name = "Veras Darkshadow", desc = "Rogue - Vanish, Envenom, Deadly Poison."},
+            },
+            notes = "Four-boss council fight. All share health pool. Kill order: Usually focus one at a time. Interrupt Malande heals. Move from Flamestrike/Blizzard. Tank Veras separately. Complex positioning."
+        },
+        ["Illidan Stormrage"] = {
+            health = {normal = "13,860,000"},
+            mana = {normal = nil},
+            abilities = {
+                {name = "Shear", desc = "Removes 60% of tank's threat - tank swap required!"},
+                {name = "Flame Burst", desc = "AoE fire damage around boss."},
+                {name = "Draw Soul", desc = "Spawns Shadow Demons that chase lowest HP players."},
+                {name = "Demon Form", desc = "Phase 2: Transforms into demon, raid-wide AoE damage."},
+                {name = "Eye Blast", desc = "Laser beam that must be avoided."},
+                {name = "Dark Barrage", desc = "Shadow damage on random players."},
+                {name = "Phase 4: Maiev", desc = "Maiev helps in final phase, place Traps."},
+            },
+            adds = "Shadow Demons, Flame of Azzinoth, Parasites",
+            notes = "Epic 5-phase fight. P1: Tank swap on Shear. P2: Demon form, spread out. P3: Tank Flames. P4: Use Maiev's traps, kill demons. P5: Burn boss. Requires Warglaive drops. Final BT boss."
+        },
+    },
+    ["Zul'Aman"] = {
+        ["Nalorakk"] = {
+            health = {normal = "2,310,000"},
+            mana = {normal = nil},
+            abilities = {
+                {name = "Mangle", desc = "Heavy bleed damage on tank."},
+                {name = "Surge", desc = "Charges random player."},
+                {name = "Bear Form", desc = "Phase 1: Bear form with Mangle/Surge."},
+                {name = "Troll Form", desc = "Phase 2: Troll form with Rend/Deafening Roar."},
+            },
+            notes = "First timed boss. Two forms alternate. Bear form: High physical damage, bleeds. Troll form: Silences and bleeds. Tank swap between phases. Healers prepare for Mangle."
+        },
+        ["Akil'zon"] = {
+            health = {normal = "2,310,000"},
+            mana = {normal = nil},
+            abilities = {
+                {name = "Static Disruption", desc = "Places storm on random player - stay away from others!"},
+                {name = "Call Lightning", desc = "Chain lightning hitting highest HP targets."},
+                {name = "Electrical Storm", desc = "Levitates random player, raid takes heavy damage."},
+                {name = "Summon Eagles", desc = "Spawns eagles that must be killed."},
+            },
+            adds = "Soaring Eagles - kill these quickly",
+            notes = "Eagle boss. Players with Static Disruption must move away from raid. Kill eagles. One player targeted by Electrical Storm - everyone else hides behind them to avoid damage."
+        },
+        ["Jan'alai"] = {
+            health = {normal = "2,310,000"},
+            mana = {normal = nil},
+            abilities = {
+                {name = "Flame Breath", desc = "Frontal cone fire attack."},
+                {name = "Fireball", desc = "Heavy fire damage on random target."},
+                {name = "Fire Bomb", desc = "Creates fire patches on ground."},
+                {name = "Hatch Eggs", desc = "Periodically hatches egg groups OR all eggs at 25% HP."},
+                {name = "Enrage", desc = "5 minute soft enrage."},
+            },
+            adds = "Dragonhawk Hatchlings from eggs",
+            notes = "Dragonhawk boss. Two strategies: Kill egg groups before they hatch OR save all eggs for burn phase. Move from Fire Bombs. Tank faces away for Flame Breath. Very AoE heavy at 25%."
+        },
+        ["Halazzi"] = {
+            health = {normal = "2,310,000"},
+            mana = {normal = nil},
+            abilities = {
+                {name = "Saber Lash", desc = "Splits damage between nearest targets - stack tanks!"},
+                {name = "Flame Shock", desc = "Fire damage DOT."},
+                {name = "Earth Shock", desc = "Interrupt."},
+                {name = "Frenzy", desc = "Lynx adds at 75%, 50%, 25% HP - splits into Lynx."},
+                {name = "Transform", desc = "Splits into Halazzi and his Lynx spirit."},
+            },
+            adds = "Corrupted Lightning Totems - destroy these",
+            notes = "Lynx boss. At each 25% threshold, splits into troll and lynx - both must be damaged. Stack melee for Saber Lash. Kill totems immediately. Tank swap ready."
+        },
+        ["Hex Lord Malacrass"] = {
+            health = {normal = "1,890,000"},
+            mana = {normal = nil},
+            abilities = {
+                {name = "Spirit Bolts", desc = "Shadow damage on multiple targets."},
+                {name = "Soul Drain", desc = "Massive 8-second drain that must be interrupted!"},
+                {name = "Steal Player Ability", desc = "Copies random player's class abilities."},
+            },
+            adds = "4 Random adds from pool - must be CC'd or killed",
+            notes = "CC or kill adds first (various combinations). CRITICAL: Interrupt Soul Drain or raid wipes! Boss gains random player abilities making each pull different. Focus interrupts."
+        },
+        ["Zul'jin"] = {
+            health = {normal = "2,940,000"},
+            mana = {normal = nil},
+            abilities = {
+                {name = "Grievous Throw", desc = "Heavy physical damage reducing healing received."},
+                {name = "Phase 1: Troll Form", desc = "Tank and spank with bleeds."},
+                {name = "Phase 2: Bear Form", desc = "Paralyzing Roar, Creeping Paralysis."},
+                {name = "Phase 3: Eagle Form", desc = "Energy Storm, Column of Fire, Summons Eagles."},
+                {name = "Phase 4: Lynx Form", desc = "Claw Rage, Lynx Rush, Summons Lynxes."},
+                {name = "Phase 5: Dragonhawk Form", desc = "Flame Whirl, Fire Breath, Flame Column."},
+            },
+            adds = "Eagles in Phase 3, Lynxes in Phase 4",
+            notes = "Final boss - 5 phases, each representing an animal god. Complex phase transitions. P2: Dispel paralysis. P3: Move from pillars, kill eagles. P4: Kill lynxes. P5: Burn boss while avoiding fire."
+        },
     },
     ["Sunwell Plateau"] = {
-        "Kalecgos",
-        "Sathrovarr the Corruptor",
-        "Brutallus",
-        "Felmyst",
-        "Grand Warlock Alythess",
-        "Lady Sacrolash",
-        "M'uru",
-        "Kil'jaeden",
+        ["Kalecgos"] = {
+            health = {normal = "10,080,000"},
+            mana = {normal = nil},
+            abilities = {
+                {name = "Spectral Blast", desc = "Arcane damage and teleport to demon realm."},
+                {name = "Arcane Buffet", desc = "Stacking arcane damage debuff."},
+                {name = "Sathrovarr", desc = "Demon form in shadow realm - must be tanked."},
+                {name = "Corrupting Strike", desc = "Stacking curse on shadow tank."},
+                {name = "Portal", desc = "Players use portals to switch between realms."},
+            },
+            notes = "Two-realm fight. Half raid fights Kalecgos in normal realm, half fights Sathrovarr demon in shadow realm. Both must die within 1 minute. Use portals to equalize. Dispel curses."
+        },
+        ["Brutallus"] = {
+            health = {normal = "10,080,000"},
+            mana = {normal = nil},
+            abilities = {
+                {name = "Meteor Slash", desc = "Massive physical damage, split between targets - 2 tanks!"},
+                {name = "Burn", desc = "Stacking fire DOT debuff on tank - tank swap!"},
+                {name = "Stomp", desc = "AoE knockback with physical damage."},
+                {name = "Enrage", desc = "6 minute hard enrage - tight DPS check!"},
+            },
+            notes = "Pure DPS race. CRITICAL: 2 tanks rotate on Burn stacks (swap at 2-3 stacks). Stack melee for Meteor Slash. 6 minute enrage - toughest DPS check in TBC. Requires full buffs and consumables."
+        },
+        ["Felmyst"] = {
+            health = {normal = "10,080,000"},
+            mana = {normal = nil},
+            abilities = {
+                {name = "Gas Nova", desc = "Raid-wide damage, leaves fog that encapsulates players."},
+                {name = "Encapsulate", desc = "Traps player in green bubble - raid must free them!"},
+                {name = "Demonic Vapor", desc = "Creates fog trails during air phase - hide behind these!"},
+                {name = "Fog of Corruption", desc = "Instant death if standing in open during air phase."},
+                {name = "Air Phase", desc = "Boss flies up, shoots beams creating fog trails."},
+            },
+            notes = "Two phases alternate. Ground: Free encapsulated players, spread for Gas Nova. Air: Boss flies creating fog trails with beams - everyone hide behind fog or die instantly. Very positioning heavy."
+        },
+        ["Eredar Twins"] = {
+            health = {normal = "5,880,000 each"},
+            mana = {normal = "500,000 each"},
+            abilities = {
+                {name = "Sacrolash - Fire", desc = "Conflagration, Flame Sear, Shadow Nova."},
+                {name = "Alythess - Shadow", desc = "Conflagration, Shadow Nova, Pyrogenics."},
+                {name = "Empower", desc = "When far apart, they empower each other."},
+                {name = "Conflagration", desc = "Huge AoE fire damage - spread out!"},
+                {name = "Shadow Nova", desc = "Shadow explosion around boss."},
+            },
+            notes = "Twin boss fight with fire/shadow mechanics. Keep bosses together or they empower. Sacrolash tank moves away before Conflagration. Raid gets buffs from same-color abilities, damage from opposite."
+        },
+        ["M'uru"] = {
+            health = {normal = "6,720,000"},
+            mana = {normal = nil},
+            abilities = {
+                {name = "Darkness", desc = "Raid-wide shadow damage increasing over time."},
+                {name = "Summon Void Sentinel", desc = "Spawns Sentinel adds."},
+                {name = "Summon Void Spawn", desc = "Spawns Spawns from dead Sentinels."},
+                {name = "Dark Fiend", desc = "Summons humanoid adds."},
+                {name = "Entropius", desc = "Phase 2: M'uru dies, becomes Entropius void god."},
+                {name = "Black Hole", desc = "Phase 2: Creates Black Holes that pull players in."},
+            },
+            adds = "Multiple add types: Sentinels, Spawns, Dark Fiends, Fury Mages",
+            notes = "Brutal 2-phase fight. P1: Kill adds while damaging boss. Darkness kills raid slowly. Very add-heavy. P2: M'uru becomes Entropius - kill Black Holes, avoid void zones, burn boss. Insane difficulty."
+        },
+        ["Kil'jaeden"] = {
+            health = {normal = "12,600,000"},
+            mana = {normal = nil},
+            abilities = {
+                {name = "Soul Flay", desc = "Shadow damage beam on random target."},
+                {name = "Legion Lightning", desc = "Chain lightning between players."},
+                {name = "Fire Bloom", desc = "Massive fire damage and knockback."},
+                {name = "Flame Dart", desc = "Fire missile on random targets."},
+                {name = "Sinister Reflection", desc = "Spawns evil clones of players."},
+                {name = "Shield Orbs", desc = "Blue orbs appear - ranged must shoot them down for shields."},
+                {name = "Darkness", desc = "Phase 2: Darkness increases, blue orbs protect raid."},
+            },
+            adds = "Sinister Reflections, Shield Orbs",
+            notes = "Final TBC boss - 5 phases. Extremely complex. P1-3: Manage adds, spread for lightning, use blue orbs for shields. P4: DPS race with Darkness. P5: All abilities active, strict positioning. Legendary bow drops."
+        },
     },
 }
 
--- Get raid boss list
+-- Get raid boss data for a specific raid and boss
+function B:GetRaidBossData(raidName, bossName)
+    if self.RaidBosses[raidName] then
+        return self.RaidBosses[raidName][bossName]
+    end
+    return nil
+end
+
+-- Get all bosses for a raid (returns detailed data)
+function B:GetRaidBossesDetailed(raidName)
+    return self.RaidBosses[raidName] or {}
+end
+
+-- Get simple boss name list for a raid (for UI)
+function B:GetRaidBossList(raidName)
+    local bosses = {}
+    if self.RaidBosses[raidName] then
+        for bossName, _ in pairs(self.RaidBosses[raidName]) do
+            table.insert(bosses, bossName)
+        end
+    end
+    return bosses
+end
+
+-- Legacy compatibility: Keep old GetRaidBosses for simple name lists
 function B:GetRaidBosses(raidName)
-    return self.Raids[raidName] or {}
+    return self:GetRaidBossList(raidName)
 end
 
 -- Get all raids
 function B:GetAllRaids()
-    return self.Raids
+    local raids = {}
+    for raidName, _ in pairs(self.RaidBosses) do
+        table.insert(raids, raidName)
+    end
+    return raids
 end

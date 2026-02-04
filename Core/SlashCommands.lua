@@ -24,8 +24,12 @@ SlashCmdList["DUNGEONSPAM"] = function(msg)
     local cmd = args[1] or ""
 
     if cmd == "reset" then
-        -- Confirm reset
-        StaticPopup_Show("DST_CONFIRM_RESET")
+        -- Confirm reset - using direct confirmation to avoid StaticPopupDialogs taint
+        print("|cffff9900[DST]|r Are you sure you want to reset? Type '/ds confirmreset' to confirm.")
+
+    elseif cmd == "confirmreset" then
+        -- Confirmed reset
+        Addon:ResetData()
 
     elseif cmd == "config" or cmd == "options" or cmd == "settings" then
         -- Show options (future implementation)
@@ -206,6 +210,8 @@ function Addon:Hide()
 end
 
 -- Confirmation dialog for reset
+-- TEMPORARILY DISABLED FOR DEBUGGING - Testing if StaticPopupDialogs causes taint
+--[[
 StaticPopupDialogs["DST_CONFIRM_RESET"] = {
     text = "Are you sure you want to reset all Dungeon Spam Tracker data?",
     button1 = "Yes",
@@ -218,3 +224,4 @@ StaticPopupDialogs["DST_CONFIRM_RESET"] = {
     hideOnEscape = true,
     preferredIndex = 3,
 }
+]]--

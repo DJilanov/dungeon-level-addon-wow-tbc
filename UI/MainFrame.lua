@@ -269,56 +269,104 @@ function Addon:CreateMainFrame()
     frame.factionLabel:SetPoint("LEFT", frame.optModeButtons[3], "RIGHT", 15, 0)
     frame.factionLabel:SetText(L["TARGET_FACTION"] .. ":")
 
-    frame.factionDropdown = CreateFrame("Frame", nil, frame, "UIDropDownMenuTemplate")
-    frame.factionDropdown:SetPoint("LEFT", frame.factionLabel, "RIGHT", -15, -2)
-    UIDropDownMenu_SetWidth(frame.factionDropdown, 140)
-    UIDropDownMenu_SetText(frame.factionDropdown, "Auto")
+    -- Create custom dropdown button (avoids UIDropDownMenu taint)
+    frame.factionDropdown = CreateFrame("Button", nil, frame, BackdropTemplateMixin and "BackdropTemplate")
+    frame.factionDropdown:SetSize(140, 30)
+    frame.factionDropdown:SetPoint("LEFT", frame.factionLabel, "RIGHT", 5, 0)
+    frame.factionDropdown:SetBackdrop({
+        bgFile = "Interface\\Buttons\\WHITE8X8",
+        edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+        tile = false,
+        edgeSize = 12,
+        insets = {left = 3, right = 3, top = 3, bottom = 3}
+    })
+    frame.factionDropdown:SetBackdropColor(0.1, 0.1, 0.1, 0.9)
+    frame.factionDropdown:SetBackdropBorderColor(0.5, 0.5, 0.5, 1)
 
-    -- Faction dropdown initialize function
-    UIDropDownMenu_Initialize(frame.factionDropdown, function(self, level)
-        local info = UIDropDownMenu_CreateInfo()
+    frame.factionDropdown.text = frame.factionDropdown:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    frame.factionDropdown.text:SetPoint("CENTER")
+    frame.factionDropdown.text:SetText("Auto")
 
-        -- Add "Auto" option
-        info.text = "Auto"
-        info.value = nil
-        info.func = function()
+    -- Create dropdown menu
+    frame.factionDropdown.menu = CreateFrame("Frame", nil, frame.factionDropdown, BackdropTemplateMixin and "BackdropTemplate")
+    frame.factionDropdown.menu:SetSize(140, 180)
+    frame.factionDropdown.menu:SetPoint("TOP", frame.factionDropdown, "BOTTOM", 0, -2)
+    frame.factionDropdown.menu:SetBackdrop({
+        bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
+        edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+        tile = true,
+        tileSize = 16,
+        edgeSize = 12,
+        insets = {left = 3, right = 3, top = 3, bottom = 3}
+    })
+    frame.factionDropdown.menu:SetBackdropColor(0.1, 0.1, 0.1, 0.95)
+    frame.factionDropdown.menu:SetFrameStrata("DIALOG")
+    frame.factionDropdown.menu:SetFrameLevel(frame:GetFrameLevel() + 10)
+    frame.factionDropdown.menu:Hide()
+
+    -- Create faction buttons
+    local factions = {"Auto", "Honor Hold", "Cenarion Expedition", "The Sha'tar", "Lower City", "Keepers of Time", "The Consortium"}
+    frame.factionDropdown.buttons = {}
+
+    for i, faction in ipairs(factions) do
+        local btn = CreateFrame("Button", nil, frame.factionDropdown.menu, BackdropTemplateMixin and "BackdropTemplate")
+        btn:SetSize(134, 22)
+        btn:SetPoint("TOP", frame.factionDropdown.menu, "TOP", 0, -3 - (i-1) * 24)
+        btn:SetBackdrop({
+            bgFile = "Interface\\Buttons\\WHITE8X8",
+            edgeFile = nil,
+            tile = false,
+        })
+        btn:SetBackdropColor(0.2, 0.2, 0.2, 0.5)
+
+        btn.text = btn:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+        btn.text:SetPoint("CENTER")
+        btn.text:SetText(faction)
+
+        btn.faction = (faction == "Auto" and nil or faction)
+        btn:SetScript("OnClick", function(self)
             if Addon.SetTargetFaction then
-                Addon:SetTargetFaction(nil)
+                Addon:SetTargetFaction(self.faction)
             end
-            pcall(UIDropDownMenu_SetText, frame.factionDropdown, "Auto")
+            frame.factionDropdown.text:SetText(faction)
+            if self.faction and Addon.Print then
+                Addon:Print(string.format(L["FACTION_CHANGED"], faction))
+            end
+            frame.factionDropdown.menu:Hide()
             frame:Refresh()
-        end
-        local currentFaction = Addon.GetTargetFaction and Addon:GetTargetFaction() or nil
-        info.checked = (currentFaction == nil)
-        UIDropDownMenu_AddButton(info)
+        end)
 
-        -- Add each faction
-        local factions = {
-            "Honor Hold",
-            "Cenarion Expedition",
-            "The Sha'tar",
-            "Lower City",
-            "Keepers of Time",
-            "The Consortium",
-        }
+        btn:SetScript("OnEnter", function(self)
+            self:SetBackdropColor(0.4, 0.4, 0.6, 0.8)
+        end)
 
-        for _, faction in ipairs(factions) do
-            info = UIDropDownMenu_CreateInfo()
-            info.text = faction
-            info.value = faction
-            info.func = function()
-                if Addon.SetTargetFaction then
-                    Addon:SetTargetFaction(faction)
-                end
-                pcall(UIDropDownMenu_SetText, frame.factionDropdown, faction)
-                if Addon.Print then
-                    Addon:Print(string.format(L["FACTION_CHANGED"], faction))
-                end
-                frame:Refresh()
-            end
-            info.checked = (currentFaction == faction)
-            UIDropDownMenu_AddButton(info)
+        btn:SetScript("OnLeave", function(self)
+            self:SetBackdropColor(0.2, 0.2, 0.2, 0.5)
+        end)
+
+        table.insert(frame.factionDropdown.buttons, btn)
+    end
+
+    -- Toggle dropdown menu
+    frame.factionDropdown:SetScript("OnClick", function(self)
+        if self.menu:IsShown() then
+            self.menu:Hide()
+        else
+            self.menu:Show()
         end
+    end)
+
+    frame.factionDropdown:SetScript("OnEnter", function(self)
+        self:SetBackdropBorderColor(1, 1, 1, 1)
+    end)
+
+    frame.factionDropdown:SetScript("OnLeave", function(self)
+        self:SetBackdropBorderColor(0.5, 0.5, 0.5, 1)
+    end)
+
+    -- Hide menu when clicking elsewhere
+    frame.factionDropdown.menu:SetScript("OnHide", function(self)
+        -- Menu hidden
     end)
 
     -- Refresh optimization mode buttons function
@@ -347,9 +395,9 @@ function Addon:CreateMainFrame()
             frame.factionLabel:Show()
             frame.factionDropdown:Show()
 
-            -- Sync dropdown text with current target faction (protected call to avoid errors)
+            -- Sync dropdown text with current target faction
             local targetFaction = addon and addon.GetTargetFaction and addon:GetTargetFaction()
-            pcall(UIDropDownMenu_SetText, frame.factionDropdown, targetFaction or "Auto")
+            frame.factionDropdown.text:SetText(targetFaction or "Auto")
         else
             frame.factionLabel:Hide()
             frame.factionDropdown:Hide()
@@ -938,17 +986,20 @@ function Addon:FormatNumber(num)
     return formatted
 end
 
--- Show detail view for a dungeon
+-- Show detail view for a dungeon or raid
 function Addon:ShowDetailView(dungeonName, dungeonData, isHeroic)
     if not self.MainFrame then return end
 
     local frame = self.MainFrame
     frame.navigationView = "detail"
 
-    -- Store current dungeon info
+    -- Store current dungeon/raid info
     frame.currentDungeon = dungeonName
     frame.currentData = dungeonData
     frame.isHeroic = isHeroic or false
+
+    -- Determine if this is a raid (raids have 'size' field, dungeons have 'minLevel')
+    frame.isRaid = (dungeonData.size ~= nil)
 
     -- Hide list view elements
     frame.recPanel:Hide()
@@ -978,22 +1029,47 @@ function Addon:ShowDetailView(dungeonName, dungeonData, isHeroic)
     local displayName = dungeonName
     if isHeroic then
         displayName = "|cffff8800HEROIC:|r " .. displayName
+    elseif frame.isRaid then
+        displayName = "|cffff00ff[RAID]|r " .. displayName
     end
     frame.detailContainer.dungeonName:SetText("|cff00ff80" .. displayName .. "|r")
 
-    -- Set dungeon stats
-    local statsText = string.format(
-        "Level: |cffffffff%d-%d|r  |  Duration: |cffffffff~%d min|r  |  Faction: |cffffffff%s|r  |  Rep/run: |cffffffff%d|r",
-        dungeonData.minLevel,
-        dungeonData.maxLevel,
-        dungeonData.avgDuration,
-        dungeonData.faction,
-        dungeonData.repPerRun
-    )
+    -- Set stats based on whether it's a dungeon or raid
+    local statsText
+    if frame.isRaid then
+        -- Raid stats
+        local raidSize = dungeonData.size or 25
+        local attunement = dungeonData.attunement or "None"
+        statsText = string.format(
+            "Size: |cffffffff%d-man|r  |  Level: |cffffffff%d|r  |  Attunement: |cffffffff%s|r",
+            raidSize,
+            dungeonData.minLevel or 70,
+            attunement
+        )
+    else
+        -- Dungeon stats
+        local levelText
+        if frame.isHeroic then
+            levelText = "70"
+        else
+            levelText = string.format("%d-%d", dungeonData.minLevel, dungeonData.maxLevel)
+        end
+        statsText = string.format(
+            "Level: |cffffffff%s|r  |  Duration: |cffffffff~%d min|r  |  Faction: |cffffffff%s|r  |  Rep/run: |cffffffff%d|r",
+            levelText,
+            dungeonData.avgDuration,
+            dungeonData.faction,
+            dungeonData.repPerRun
+        )
+    end
     frame.detailContainer.dungeonStats:SetText(statsText)
 
-    -- Select default tab (Loot)
-    self:SelectDetailTab("Loot")
+    -- Select default tab (Loot for raids, Bosses is more useful)
+    if frame.isRaid then
+        self:SelectDetailTab("Bosses")
+    else
+        self:SelectDetailTab("Loot")
+    end
 end
 
 -- Show list view (back from detail)
@@ -1087,10 +1163,11 @@ function Addon:ShowLootTab()
     frame.detailLootContainer:Show()
     frame.detailScrollFrame:Show()
 
-    -- Hide map texture if it exists
+    -- Hide map texture and container
     if frame.mapTextureFrame then
         frame.mapTextureFrame:Hide()
     end
+    frame.detailMapContainer:Hide()
 
     -- Clear existing loot buttons
     for _, btn in ipairs(frame.lootButtons) do
@@ -1099,7 +1176,13 @@ function Addon:ShowLootTab()
     end
     wipe(frame.lootButtons)
 
-    local lootData = DST.LootData and DST.LootData:GetDungeonLoot(frame.currentDungeon)
+    -- Get loot data for dungeon or raid
+    local lootData
+    if frame.isRaid then
+        lootData = DST.LootData and DST.LootData:GetRaidLoot(frame.currentDungeon)
+    else
+        lootData = DST.LootData and DST.LootData:GetDungeonLoot(frame.currentDungeon)
+    end
     local yOffset = 0
 
     if lootData and lootData.bosses then
@@ -1113,7 +1196,14 @@ function Addon:ShowLootTab()
             yOffset = yOffset - 20
 
             if boss.items then
-                local itemList = frame.isHeroic and boss.items.heroic or boss.items.normal
+                -- For raids, items is a direct array; for dungeons, it's {normal: [], heroic: []}
+                local itemList
+                if frame.isRaid then
+                    itemList = boss.items
+                else
+                    itemList = frame.isHeroic and boss.items.heroic or boss.items.normal
+                end
+
                 if itemList and #itemList > 0 then
                     local col = 0
                     local rowOffset = yOffset
@@ -1184,9 +1274,9 @@ function Addon:ShowLootTab()
 
                         -- Click to link item in chat
                         itemBtn:SetScript("OnClick", function(self)
-                            if self.itemLink and IsShiftKeyDown() then
-                                -- Shift-click to link in chat
-                                ChatEdit_InsertLink(self.itemLink)
+                            if self.itemLink then
+                                -- Use WoW's built-in handler for shift-click to link, ctrl-click for dressing room, etc.
+                                HandleModifiedItemClick(self.itemLink)
                             end
                         end)
 
@@ -1231,11 +1321,17 @@ function Addon:ShowLootTab()
                     yOffset = yOffset - 20
                 end
             else
-                local count = frame.isHeroic and (boss.heroic or 0) or (boss.normal or 0)
+                -- For raids, use itemCount; for dungeons, use normal/heroic
+                local count
+                if frame.isRaid then
+                    count = boss.itemCount or 0
+                else
+                    count = frame.isHeroic and (boss.heroic or 0) or (boss.normal or 0)
+                end
                 local countText = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
                 countText:SetParent(frame.detailLootContainer)
                 countText:SetPoint("TOPLEFT", frame.detailLootContainer, "TOPLEFT", 10, yOffset)
-                countText:SetText(string.format("|cffffffff%d items|r |cffaaaaaa(item data not yet added)|r", count))
+                countText:SetText(string.format("|cffffffff%d items|r |cffaaaaaa(detailed item data not yet added)|r", count))
                 table.insert(frame.lootButtons, countText)
                 yOffset = yOffset - 20
             end
@@ -1273,16 +1369,31 @@ function Addon:ShowBossesTab()
     frame.detailLootContainer:Hide()
     frame.detailScrollFrame:Show()
 
-    -- Hide map texture if it exists
+    -- Hide map texture and container
     if frame.mapTextureFrame then
         frame.mapTextureFrame:Hide()
     end
+    frame.detailMapContainer:Hide()
 
-    local modeText = frame.isHeroic and "|cffff8800Heroic Mode|r" or "|cff00ff80Normal Mode|r"
+    local modeText
+    if frame.isRaid then
+        modeText = "|cffff00ff25-Man Raid|r"
+        -- Check if it's a 10-man raid
+        if frame.currentData and frame.currentData.size == 10 then
+            modeText = "|cffff00ff10-Man Raid|r"
+        end
+    else
+        modeText = frame.isHeroic and "|cffff8800Heroic Mode|r" or "|cff00ff80Normal Mode|r"
+    end
     local text = "|cffffd700=== Boss Overview (" .. modeText .. ") ===|r\n\n"
 
     -- Try to get boss data from BossData.lua
-    local bossData = DST.BossData and DST.BossData:GetDungeonBosses(frame.currentDungeon)
+    local bossData
+    if frame.isRaid then
+        bossData = DST.BossData and DST.BossData:GetRaidBossesDetailed(frame.currentDungeon)
+    else
+        bossData = DST.BossData and DST.BossData:GetDungeonBosses(frame.currentDungeon)
+    end
 
     if bossData and next(bossData) then
         -- Use BossData for detailed boss information
@@ -1290,9 +1401,9 @@ function Addon:ShowBossesTab()
         for bossName, data in pairs(bossData) do
             text = text .. string.format("|cff00ff80%d. %s|r\n", bossIndex, bossName)
 
-            -- Health
+            -- Health (raids only have normal mode)
             if data.health then
-                local health = frame.isHeroic and data.health.heroic or data.health.normal
+                local health = (not frame.isRaid and frame.isHeroic) and data.health.heroic or data.health.normal
                 if health then
                     text = text .. string.format("   |cffffffffHealth:|r %s\n", health)
                 end
@@ -1300,7 +1411,7 @@ function Addon:ShowBossesTab()
 
             -- Mana
             if data.mana then
-                local mana = frame.isHeroic and data.mana.heroic or data.mana.normal
+                local mana = (not frame.isRaid and frame.isHeroic) and data.mana.heroic or data.mana.normal
                 if mana then
                     text = text .. string.format("   |cffffffffMana:|r %s\n", mana)
                 end
@@ -1365,6 +1476,9 @@ function Addon:ShowStrategyTab()
     frame.detailContentText:Show()
     frame.detailLootContainer:Hide()
 
+    -- Hide map container
+    frame.detailMapContainer:Hide()
+
     local data = frame.currentData
 
     if not data.guide or #data.guide == 0 then
@@ -1406,6 +1520,7 @@ function Addon:ShowMapTab()
     frame.detailContentText:Hide()
     frame.detailLootContainer:Hide()
     frame.detailScrollFrame:Hide()
+    frame.detailMapContainer:Hide()
 
     -- Create map texture frame if it doesn't exist (parent to detailContainer, not scrollChild)
     if not frame.mapTextureFrame then
@@ -1429,15 +1544,20 @@ function Addon:ShowMapTab()
 
     frame.mapTextureFrame:Show()
 
-    -- Try to load dungeon map texture
-    local dungeonKey = frame.currentDungeon
-    local mapPath = self:GetDungeonMapTexture(dungeonKey)
+    -- Check if it's a raid with an image first
+    local mapPath
+    if frame.isRaid and frame.currentData and frame.currentData.image then
+        mapPath = "Interface\\AddOns\\DJDungeonSpamGuide\\" .. frame.currentData.image
+    else
+        -- Try to load dungeon map texture
+        mapPath = self:GetDungeonMapTexture(frame.currentDungeon)
+    end
 
     if mapPath then
         frame.mapTextureFrame.texture:SetTexture(mapPath)
         frame.mapTextureFrame.texture:SetTexCoord(0, 1, 0, 1)  -- Reset coords each time
         frame.mapTextureFrame.texture:Show()
-        frame.mapTextureFrame.infoText:SetText("|cff00ff80" .. dungeonKey .. " Map|r")
+        frame.mapTextureFrame.infoText:SetText("|cff00ff80" .. frame.currentDungeon .. " Map|r")
     else
         -- Show placeholder
         frame.mapTextureFrame.texture:Hide()
@@ -1565,39 +1685,71 @@ function Addon:ShowLocationTab()
         frame.mapTextureFrame:Hide()
     end
 
+    -- Hide map container on location tab
+    frame.detailMapContainer:Hide()
+
     local data = frame.currentData
 
     local text = "|cffffd700=== Location & Entrance ===|r\n\n"
-    text = text .. "|cffffffffZone:|r |cff00ff80" .. (data.zone or "Unknown") .. "|r\n"
-    text = text .. "|cffffffffEntrance:|r " .. (data.entrance or data.zone or "Unknown") .. "\n\n"
 
-    text = text .. "|cffffd700Requirements:|r\n"
-    text = text .. string.format("   Level: |cffffffff%d-%d|r", data.minLevel, data.maxLevel)
-    if frame.isHeroic then
-        text = text .. " |cffff8800(Level 70 required for Heroic)|r\n"
-        text = text .. string.format("   Faction Key: |cffffffff%s (Revered)|r\n", data.faction)
-    else
+    if frame.isRaid then
+        -- Raid location information
+        text = text .. "|cffffffffLocation:|r |cff00ff80" .. (data.location or "Unknown") .. "|r\n\n"
+
+        text = text .. "|cffffd700Raid Information:|r\n"
+        text = text .. string.format("   Size: |cffffffff%d-man raid|r\n", data.size or 25)
+        text = text .. string.format("   Level Requirement: |cffffffff%d|r\n", data.minLevel or 70)
         text = text .. "\n"
-    end
-    text = text .. "\n"
 
-    text = text .. "|cffffd700Dungeon Information:|r\n"
-    text = text .. string.format("   Average Duration: |cffffffff~%d minutes|r\n", data.avgDuration or 25)
-    text = text .. string.format("   Associated Faction: |cffffffff%s|r\n", data.faction)
+        text = text .. "|cffffd700Attunement:|r\n"
+        text = text .. "   " .. (data.attunement or "None") .. "\n\n"
 
-    if data.requiredFor and #data.requiredFor > 0 then
-        text = text .. "\n|cffffd700Important For:|r\n"
-        for _, requirement in ipairs(data.requiredFor) do
-            text = text .. "   • " .. requirement .. "\n"
+        if data.bosses and #data.bosses > 0 then
+            text = text .. "|cffffd700Boss Encounters:|r\n"
+            for _, bossName in ipairs(data.bosses) do
+                text = text .. "   • " .. bossName .. "\n"
+            end
+            text = text .. "\n"
         end
-    end
 
-    text = text .. "\n|cffffd700Reputation Gain:|r\n"
-    text = text .. string.format("   Per Run: |cffffffff%d rep|r\n", data.repPerRun or 0)
-    text = text .. string.format("   Cap: |cffffffff%s (%d rep)|r\n", data.repCap or "Unknown", data.repCapValue or 0)
+        if data.guide and #data.guide > 0 then
+            text = text .. "|cffffd700Strategy Overview:|r\n"
+            for _, line in ipairs(data.guide) do
+                text = text .. "   • " .. line .. "\n"
+            end
+        end
+    else
+        -- Dungeon location information
+        text = text .. "|cffffffffZone:|r |cff00ff80" .. (data.zone or "Unknown") .. "|r\n"
+        text = text .. "|cffffffffEntrance:|r " .. (data.entrance or data.zone or "Unknown") .. "\n\n"
 
-    if frame.isHeroic then
-        text = text .. "\n|cffaaaaaa* Heroic mode grants reputation beyond normal cap\n* Heroic keys obtained at Revered reputation\n* Daily quest available for additional rewards|r"
+        text = text .. "|cffffd700Requirements:|r\n"
+        if frame.isHeroic then
+            text = text .. "   Level: |cffffffff70|r |cffff8800(Heroic)|r\n"
+            text = text .. string.format("   Faction Key: |cffffffff%s (Revered)|r\n", data.faction)
+        else
+            text = text .. string.format("   Level: |cffffffff%d-%d|r\n", data.minLevel, data.maxLevel)
+        end
+        text = text .. "\n"
+
+        text = text .. "|cffffd700Dungeon Information:|r\n"
+        text = text .. string.format("   Average Duration: |cffffffff~%d minutes|r\n", data.avgDuration or 25)
+        text = text .. string.format("   Associated Faction: |cffffffff%s|r\n", data.faction)
+
+        if data.requiredFor and #data.requiredFor > 0 then
+            text = text .. "\n|cffffd700Important For:|r\n"
+            for _, requirement in ipairs(data.requiredFor) do
+                text = text .. "   • " .. requirement .. "\n"
+            end
+        end
+
+        text = text .. "\n|cffffd700Reputation Gain:|r\n"
+        text = text .. string.format("   Per Run: |cffffffff%d rep|r\n", data.repPerRun or 0)
+        text = text .. string.format("   Cap: |cffffffff%s (%d rep)|r\n", data.repCap or "Unknown", data.repCapValue or 0)
+
+        if frame.isHeroic then
+            text = text .. "\n|cffaaaaaa* Heroic mode grants reputation beyond normal cap\n* Heroic keys obtained at Revered reputation\n* Daily quest available for additional rewards|r"
+        end
     end
 
     frame.detailContentText:SetText(text)

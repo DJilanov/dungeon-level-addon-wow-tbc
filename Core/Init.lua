@@ -2,7 +2,7 @@
 local ADDON_NAME, DST = ...
 
 -- Copy table utility (must be defined first!)
-function CopyTable(t)
+local function CopyTable(t)
     if type(t) ~= "table" then return t end
     local copy = {}
     for k, v in pairs(t) do
