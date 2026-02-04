@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://raw.githubusercontent.com/DJilanov/dungeon-level-addon-wow-tbc/main/screenshots/logo.jpg" alt="DJ Dungeon Spam Guide Logo" width="400"/>
+</p>
+
 # DJ Dungeon Spam Guide
 
 **The ultimate leveling companion for World of Warcraft's 20th Anniversary TBC phase!**
