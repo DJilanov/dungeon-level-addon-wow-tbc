@@ -6,6 +6,9 @@ manual-changelog:
   filename: CHANGES.md
   markup-type: markdown
 
+# CurseForge project ID
+curse-project-id: 1454028
+
 ignore:
   - .git
   - .github
