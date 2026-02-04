@@ -1,0 +1,34 @@
+## Interface: 20505
+## Title: |cff00ff00DJ Dungeon Spam Guide|r
+## Notes: Track TBC dungeon spam progress for optimal leveling and reputation gains
+## Author: Dimitar Jilanov
+## Version: 1.0.0
+## SavedVariables: DJDungeonSpamGuideDB
+## IconTexture: Interface\Icons\INV_Misc_Book_09
+
+# Localization
+Locales/enUS.lua
+
+# Core
+Core/Init.lua
+Core/Constants.lua
+
+# Data
+Data/ExpPerLevel.lua
+Data/ReputationThresholds.lua
+Data/DungeonData.lua
+Data/RaidData.lua
+
+# Core (continued - depends on data)
+Core/Events.lua
+Core/SlashCommands.lua
+
+# Modules
+Modules/Tracker.lua
+Modules/Recommender.lua
+Modules/ZoneDetection.lua
+
+# UI
+UI/ProgressBar.lua
+UI/DungeonCard.lua
+UI/MainFrame.lua

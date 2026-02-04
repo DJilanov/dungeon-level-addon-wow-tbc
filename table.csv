@@ -1,0 +1,16 @@
+Dungeon,Faction,Rep per Run,Max Rep Level,Unrested EXP per Run (approx),Time per Run,EXP/hr,Rep/hr,Useful For,Required For
+Hellfire Ramparts,Honor Hold/Thrallmar,633,Friendly,"45,000",20 min,"135,000","1,900","Heroic keys (Rev), plate/mail/cloth gear, BS/JC/LW recipes",-
+Blood Furnace,Honor Hold/Thrallmar,750,Friendly,"48,000",22 min,"131,000","2,050",Same as above,Heroic BF boss kill (SSC attunement)
+Shattered Halls,Honor Hold/Thrallmar,"1,600",Honored+,"50,000",25 min,"120,000","3,840",Same as above,SSC attunement chain (in Kara)
+The Slave Pens,Cenarion Expedition,850,Friendly,"48,000",22 min,"131,000","2,320","Heroic keys, Clefthoof patterns (LW), enchants, nature pots",Heroic key for Coilfang heroics
+The Underbog,Cenarion Expedition,900,Honored,"48,000",25 min,"115,200","2,160",Same as above,-
+The Steamvault,Cenarion Expedition,"1,700",Exalted,"50,000",28 min,"107,100","3,640",Same as above (best for exalted grind),-
+Mana-Tombs,The Consortium,850,Honored,"48,000",22 min,"131,000","2,320","JC designs, ring enchants, ethereal recipes",Ethereum keys (Netherstorm)
+Auchenai Crypts,Lower City,700,Honored,"48,000",25 min,"115,200","1,680","Flask recipes (Alc), cloak/tailor patterns, JC",Heroic key for Auchindoun
+Sethekk Halls,Lower City,"1,035",Honored,"49,000",25 min,"117,600","2,490",Same as above,Kara attunement chain (Ikiss kill)
+Shadow Labyrinth,Lower City,"1,750",Exalted,"50,000",30 min,"100,000","3,500",Same as above (best for exalted),Kara attunement (Key Fragment 1)
+The Mechanar,The Sha'tar,"1,600",Exalted,"50,000",25 min,"120,000","3,840","Head glyphs (tank/caster), PvP gear","Arcatraz key shard, Kara chain"
+The Botanica,The Sha'tar,"2,200",Exalted,"50,000",30 min,"100,000","4,400",Same as above,Tempest Keep raid attunement
+The Arcatraz,The Sha'tar,"1,800",Exalted,"50,000",30 min,"100,000","3,600",Same as above,Kara attunement (Key Fragment 3)
+Old Hillsbrad Foothills,Keepers of Time,975,Exalted,"50,000",28 min,"107,100","2,090","Ring enchants, LW drums, JC facets",Unlocks Black Morass questline
+The Black Morass,Keepers of Time,"1,055",Exalted,"50,000",28 min,"107,100","2,260",Same as above,Kara/Sunwell attunements
