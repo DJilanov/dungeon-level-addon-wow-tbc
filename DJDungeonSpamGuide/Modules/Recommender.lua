@@ -107,22 +107,35 @@ function Recommender:GetRepOptimizedRecommendation()
 
         -- Check level requirement
         if playerLevel >= data.minLevel then
-            -- If targeting specific faction, only include that faction's dungeons
-            if targetFaction and data.faction ~= targetFaction then
-                -- Skip
+            -- If targeting specific faction, only include that faction's dungeons (even if capped)
+            if targetFaction then
+                if data.faction == targetFaction then
+                    table.insert(candidates, {
+                        name = name,
+                        data = data,
+                        repPerHour = data.repPerHour,
+                        faction = data.faction,
+                        isCapped = tracker:IsDungeonRepCapped(name),
+                    })
+                end
+            -- No target faction: include all non-capped dungeons
             elseif not tracker:IsDungeonRepCapped(name) then
                 table.insert(candidates, {
                     name = name,
                     data = data,
                     repPerHour = data.repPerHour,
                     faction = data.faction,
+                    isCapped = false,
                 })
             end
         end
     end
 
-    -- Sort by rep/hour descending
+    -- Sort by: non-capped first, then by rep/hour descending
     table.sort(candidates, function(a, b)
+        if a.isCapped ~= b.isCapped then
+            return not a.isCapped -- non-capped first
+        end
         return a.repPerHour > b.repPerHour
     end)
 
@@ -138,12 +151,31 @@ function Recommender:GetRepOptimizedRecommendation()
         }
     end
 
-    -- If target faction specified but all capped, try other factions
+    -- If target faction specified but no available dungeons at current level,
+    -- check if there are higher-level dungeons for that faction
     if targetFaction then
-        if Addon.SetTargetFaction then
-            Addon:SetTargetFaction(nil)
+        -- Check if any target faction dungeons exist at higher levels
+        local hasLockedDungeons = false
+        for _, dungeonEntry in ipairs(orderedDungeons) do
+            if dungeonEntry.data.faction == targetFaction and playerLevel < dungeonEntry.data.minLevel then
+                hasLockedDungeons = true
+                break
+            end
         end
-        return self:GetRepOptimizedRecommendation()
+
+        if hasLockedDungeons then
+            -- Recommend best XP dungeon to level up for the locked target faction dungeon
+            return self:GetXPOptimizedRecommendation()
+        else
+            -- No more target faction dungeons at any level, switch to Auto
+            if Addon.SetTargetFaction then
+                Addon:SetTargetFaction(nil)
+            end
+            if Addon.MainFrame and Addon.MainFrame.factionDropdown then
+                UIDropDownMenu_SetText(Addon.MainFrame.factionDropdown, "Auto")
+            end
+            return self:GetRepOptimizedRecommendation()
+        end
     end
 
     return nil
@@ -232,15 +264,21 @@ function Recommender:GetAllDungeonStatus()
     local recommendation = self:GetRecommendation()
     local recommendedName = recommendation and recommendation.name or nil
 
+    -- Check if we're in rep mode with a target faction selected
+    local mode = Addon.GetOptimizationMode and Addon:GetOptimizationMode() or "balanced"
+    local targetFaction = (mode == "rep") and (Addon.GetTargetFaction and Addon:GetTargetFaction()) or nil
+
     local results = {}
     local orderedDungeons = D:GetOrderedDungeons()
 
+    -- In rep mode with target faction, show ALL dungeons but sort target faction first
     for _, dungeonEntry in ipairs(orderedDungeons) do
         local name = dungeonEntry.name
         local data = dungeonEntry.data
 
         local status, statusText = tracker:GetDungeonStatus(name)
         local isRecommended = (name == recommendedName)
+        local isTargetFaction = targetFaction and (data.faction == targetFaction)
 
         local entry = {
             name = name,
@@ -248,6 +286,7 @@ function Recommender:GetAllDungeonStatus()
             status = status,
             statusText = statusText,
             isRecommended = isRecommended,
+            isTargetFaction = isTargetFaction,
             runsCompleted = tracker:GetDungeonRuns(name),
             runsToRepCap = tracker:GetRunsToRepCap(name),
             runsToLevel = tracker:GetRunsToLevel(name),
@@ -257,6 +296,12 @@ function Recommender:GetAllDungeonStatus()
 
         table.insert(results, entry)
     end
+
+    -- Always sort by progression order (level-based)
+    -- The isTargetFaction flag is used by UI to highlight, not for sorting
+    table.sort(results, function(a, b)
+        return a.data.order < b.data.order
+    end)
 
     return results
 end

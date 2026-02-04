@@ -118,7 +118,7 @@ function Addon:CreateMainFrame()
     }
 
     for i, modeData in ipairs(modeButtons) do
-        local btn = CreateFrame("Button", nil, frame, BackdropTemplateMixin and "BackdropTemplate")
+        local btn = CreateFrame("Button", "DSTOptBtn"..i, frame, BackdropTemplateMixin and "BackdropTemplate")
         btn:SetSize(140, 30)
         btn.mode = modeData.mode
         btn.tooltip = modeData.tooltip
@@ -128,6 +128,10 @@ function Addon:CreateMainFrame()
         else
             btn:SetPoint("LEFT", frame.optModeButtons[i-1], "RIGHT", 5, 0)
         end
+
+        -- Enable mouse interaction properly
+        btn:SetFrameLevel(frame:GetFrameLevel() + 2)
+        btn:EnableMouse(true)
 
         -- Custom button background that scales properly
         btn:SetBackdrop({
@@ -149,23 +153,16 @@ function Addon:CreateMainFrame()
         btn.text:SetJustifyV("MIDDLE")
 
         btn:SetScript("OnClick", function(self)
-            print("[DST] Button clicked: " .. self.mode)
-            if Addon.SetOptimizationMode then
-                print("[DST] Calling SetOptimizationMode with: " .. self.mode)
-                local success = Addon:SetOptimizationMode(self.mode)
-                print("[DST] SetOptimizationMode returned: " .. tostring(success))
+            local addon = DJDungeonSpamGuide
+            if addon and addon.SetOptimizationMode then
+                local success = addon:SetOptimizationMode(self.mode)
                 if success then
-                    if Addon.Print then
-                        Addon:Print(string.format(L["MODE_CHANGED"], modeData.label))
+                    if addon.Print then
+                        addon:Print(string.format(L["MODE_CHANGED"], modeData.label))
                     end
                     frame:RefreshOptModeButtons()
                     frame:Refresh()
-                else
-                    print("[DST] SetOptimizationMode failed")
                 end
-            else
-                print("[DST Error] SetOptimizationMode not available")
-                print("[DST Debug] Addon table:", Addon)
             end
         end)
 
@@ -189,6 +186,10 @@ function Addon:CreateMainFrame()
             end
             GameTooltip:Hide()
         end)
+
+        -- Explicitly enable button and register for clicks
+        btn:Enable()
+        btn:RegisterForClicks("LeftButtonUp")
 
         frame.optModeButtons[i] = btn
     end
@@ -252,7 +253,8 @@ function Addon:CreateMainFrame()
 
     -- Refresh optimization mode buttons function
     frame.RefreshOptModeButtons = function(self)
-        local currentMode = Addon.GetOptimizationMode and Addon:GetOptimizationMode() or "balanced"
+        local addon = DJDungeonSpamGuide
+        local currentMode = addon and addon.GetOptimizationMode and addon:GetOptimizationMode() or "balanced"
         for _, btn in ipairs(frame.optModeButtons) do
             if btn.mode == currentMode then
                 -- Active button - green highlight
@@ -286,9 +288,11 @@ function Addon:CreateMainFrame()
     frame.viewMode = "dungeons" -- default to dungeons
 
     -- Dungeons button (positioned after faction dropdown, or after opt buttons if dropdown hidden)
-    frame.dungeonsButton = CreateFrame("Button", nil, frame, BackdropTemplateMixin and "BackdropTemplate")
+    frame.dungeonsButton = CreateFrame("Button", "DSTDungeonsBtn", frame, BackdropTemplateMixin and "BackdropTemplate")
     frame.dungeonsButton:SetSize(100, 30)
     frame.dungeonsButton:SetPoint("LEFT", frame.optModeLabel, "LEFT", 550, 0)
+    frame.dungeonsButton:SetFrameLevel(frame:GetFrameLevel() + 2)
+    frame.dungeonsButton:EnableMouse(true)
     frame.dungeonsButton:SetBackdrop({
         bgFile = "Interface\\Buttons\\WHITE8X8",
         edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
@@ -303,23 +307,48 @@ function Addon:CreateMainFrame()
     frame.dungeonsButton.text:SetPoint("CENTER")
     frame.dungeonsButton.text:SetText("Dungeons")
 
+    -- Enable button and register for clicks
+    frame.dungeonsButton:Enable()
+    frame.dungeonsButton:RegisterForClicks("LeftButtonUp")
+
     frame.dungeonsButton:SetScript("OnClick", function(self)
-        -- Clicking Dungeons switches TO Raids view
-        frame.viewMode = "raids"
-        frame.listHeader:SetText("All Raids")
-        -- Hide Dungeons button, show Raids button
+        -- Clicking Dungeons button switches TO dungeons view
+        frame.viewMode = "dungeons"
+        frame.listHeader:SetText("All Dungeons")
         self:Hide()
         frame.raidsButton:Show()
-        frame.raidsButton:SetBackdropColor(0.7, 0.2, 0.5, 0.9)
-        frame.raidsButton:SetBackdropBorderColor(1, 0.3, 0.7, 1)
-        print("[DST] Switched to Raids view")
+
+        -- Restore saved optimization mode if exists
+        local addon = DJDungeonSpamGuide
+        if addon and addon.SetOptimizationMode and frame.savedOptMode then
+            addon:SetOptimizationMode(frame.savedOptMode)
+            frame.savedOptMode = nil
+        end
+
+        -- Show optimization buttons in dungeons view
+        frame.optModeLabel:Show()
+        frame.factionLabel:Show()
+        frame.factionDropdown:Show()
+        for _, btn in ipairs(frame.optModeButtons) do
+            btn:Show()
+        end
+        frame:RefreshOptModeButtons()
         frame:Refresh()
+
+        -- Force scroll to top with delay
+        C_Timer.After(0.2, function()
+            if frame and frame.scrollFrame then
+                frame.scrollFrame:SetVerticalScroll(0)
+            end
+        end)
     end)
 
     -- Raids button (same position as dungeons button, on optimization row)
-    frame.raidsButton = CreateFrame("Button", nil, frame, BackdropTemplateMixin and "BackdropTemplate")
+    frame.raidsButton = CreateFrame("Button", "DSTRaidsBtn", frame, BackdropTemplateMixin and "BackdropTemplate")
     frame.raidsButton:SetSize(100, 30)
     frame.raidsButton:SetPoint("LEFT", frame.optModeLabel, "LEFT", 550, 0)
+    frame.raidsButton:SetFrameLevel(frame:GetFrameLevel() + 2)
+    frame.raidsButton:EnableMouse(true)
     frame.raidsButton:SetBackdrop({
         bgFile = "Interface\\Buttons\\WHITE8X8",
         edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
@@ -334,21 +363,45 @@ function Addon:CreateMainFrame()
     frame.raidsButton.text:SetPoint("CENTER")
     frame.raidsButton.text:SetText("Raids")
 
+    -- Enable button and register for clicks
+    frame.raidsButton:Enable()
+    frame.raidsButton:RegisterForClicks("LeftButtonUp")
+
     frame.raidsButton:SetScript("OnClick", function(self)
-        -- Clicking Raids switches TO Dungeons view
-        frame.viewMode = "dungeons"
-        frame.listHeader:SetText("All Dungeons")
-        -- Hide Raids button, show Dungeons button
+        -- Clicking Raids button switches TO raids view
+        frame.viewMode = "raids"
+        frame.listHeader:SetText("All Raids")
         self:Hide()
         frame.dungeonsButton:Show()
-        frame.dungeonsButton:SetBackdropColor(0.2, 0.6, 0.3, 0.9)
-        frame.dungeonsButton:SetBackdropBorderColor(0, 1, 0, 1)
-        print("[DST] Switched to Dungeons view")
+
+        -- Save current mode and switch to balanced for raids view
+        local addon = DJDungeonSpamGuide
+        if addon and addon.GetOptimizationMode then
+            frame.savedOptMode = addon:GetOptimizationMode()
+            if addon.SetOptimizationMode and frame.savedOptMode ~= "balanced" then
+                addon:SetOptimizationMode("balanced")
+            end
+        end
+
+        -- Hide optimization buttons in raids view (they're only for dungeons)
+        frame.optModeLabel:Hide()
+        frame.factionLabel:Hide()
+        frame.factionDropdown:Hide()
+        for _, btn in ipairs(frame.optModeButtons) do
+            btn:Hide()
+        end
         frame:Refresh()
+
+        -- Force scroll to top with delay
+        C_Timer.After(0.2, function()
+            if frame and frame.scrollFrame then
+                frame.scrollFrame:SetVerticalScroll(0)
+            end
+        end)
     end)
 
-    -- Initially hide raids button (dungeons is default active view)
-    frame.raidsButton:Hide()
+    -- Initially hide dungeons button (dungeons is default active view, so show Raids button to switch)
+    frame.dungeonsButton:Hide()
 
     -- Scroll frame for dungeon list (smaller height to fit faction panel)
     frame.scrollFrame = CreateFrame("ScrollFrame", nil, frame, "UIPanelScrollFrameTemplate")
@@ -463,19 +516,10 @@ function Addon:RefreshRecommendation()
     if not self.MainFrame then return end
 
     local recommender = self.Recommender
-    if not recommender then
-        print("[DST Debug] RefreshRecommendation: No Recommender")
-        return
-    end
+    if not recommender then return end
 
     local frame = self.MainFrame
     local rec = recommender:GetRecommendation()
-
-    if rec then
-        print("[DST Debug] RefreshRecommendation: Got recommendation: " .. rec.name)
-    else
-        print("[DST Debug] RefreshRecommendation: No recommendation returned")
-    end
 
     if rec then
         local text = string.format(
@@ -499,31 +543,34 @@ end
 
 -- Refresh dungeon/raid list
 function Addon:RefreshDungeonList()
-    if not self.MainFrame then
-        print("[DST Debug] RefreshDungeonList: No MainFrame")
-        return
-    end
+    if not self.MainFrame then return end
 
     local frame = self.MainFrame
     local viewMode = frame.viewMode or "dungeons"
 
-    -- Clear existing cards
+    -- Clear existing cards thoroughly
     for _, card in ipairs(frame.dungeonCards) do
         card:Hide()
+        card:SetParent(nil)
+        card:ClearAllPoints()
     end
     wipe(frame.dungeonCards)
+
+    -- Also hide any orphaned children of scrollChild
+    local children = {frame.scrollChild:GetChildren()}
+    for _, child in ipairs(children) do
+        if child.SetDungeon then
+            child:Hide()
+        end
+    end
 
     local yOffset = -5
 
     if viewMode == "raids" then
         -- Show raids
-        if not DST.RaidData then
-            print("[DST Debug] RaidData not loaded")
-            return
-        end
+        if not DST.RaidData then return end
 
         local allRaids = DST.RaidData:GetOrderedRaids()
-        print("[DST Debug] RefreshDungeonList: Found " .. #allRaids .. " raids")
 
         for i, raidEntry in ipairs(allRaids) do
             local card = DST.DungeonCard:Create(frame.scrollChild, 620)
@@ -552,13 +599,9 @@ function Addon:RefreshDungeonList()
     else
         -- Show dungeons
         local recommender = self.Recommender
-        if not recommender then
-            print("[DST Debug] RefreshDungeonList: No Recommender")
-            return
-        end
+        if not recommender then return end
 
         local allDungeons = recommender:GetAllDungeonStatus()
-        print("[DST Debug] RefreshDungeonList: Found " .. #allDungeons .. " dungeons")
 
         for i, dungeonStatus in ipairs(allDungeons) do
             local card = DST.DungeonCard:Create(frame.scrollChild, 620)
@@ -573,7 +616,8 @@ function Addon:RefreshDungeonList()
     end
 
     -- Update scroll child height
-    frame.scrollChild:SetHeight(math.abs(yOffset) + 50)
+    local newHeight = math.max(math.abs(yOffset) + 50, frame.scrollFrame:GetHeight())
+    frame.scrollChild:SetHeight(newHeight)
 end
 
 -- Refresh faction progress bars

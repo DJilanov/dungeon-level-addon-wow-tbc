@@ -57,12 +57,16 @@ function DungeonCard:Create(parent, width)
     end)
     card:SetScript("OnLeave", function(self)
         local status = self.cardStatus or "AVAILABLE"
+        local isTargetFaction = self.statusInfo and self.statusInfo.isTargetFaction
+
         if status == "COMPLETE" then
             self:SetBackdropBorderColor(0.0, 1.0, 0.0, 1)
         elseif status == "RECOMMENDED" then
             self:SetBackdropBorderColor(0.0, 1.0, 0.5, 1)
         elseif status == "LOCKED" then
             self:SetBackdropBorderColor(0.5, 0.5, 0.5, 1)
+        elseif isTargetFaction then
+            self:SetBackdropBorderColor(0.4, 0.6, 1.0, 1)
         else
             self:SetBackdropBorderColor(0.6, 0.6, 0.6, 1)
         end
@@ -108,6 +112,17 @@ function DungeonCard:UpdateCard()
         self:SetBackdropBorderColor(0.5, 0.5, 0.5, 1)
     else
         self:SetBackdropBorderColor(0.6, 0.6, 0.6, 1)
+    end
+
+    -- Highlight target faction dungeons with subtle tint
+    if status.isTargetFaction then
+        self:SetBackdropColor(0.15, 0.15, 0.25, 0.9)
+        -- Add a slight blue tint to border for target faction
+        if not status.isRecommended and status.status ~= "COMPLETE" and status.status ~= "LOCKED" then
+            self:SetBackdropBorderColor(0.4, 0.6, 1.0, 1)
+        end
+    else
+        self:SetBackdropColor(0.1, 0.1, 0.1, 0.8)
     end
 
     self.name:SetText(string.format("|cff%02x%02x%02x%s|r",

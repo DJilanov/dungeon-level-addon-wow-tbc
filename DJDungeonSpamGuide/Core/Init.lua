@@ -1,6 +1,20 @@
 -- Dungeon Spam Tracker - Initialization
 local ADDON_NAME, DST = ...
 
+-- Copy table utility (must be defined first!)
+function CopyTable(t)
+    if type(t) ~= "table" then return t end
+    local copy = {}
+    for k, v in pairs(t) do
+        if type(v) == "table" then
+            copy[k] = CopyTable(v)
+        else
+            copy[k] = v
+        end
+    end
+    return copy
+end
+
 -- Create main addon table
 DJDungeonSpamGuide = {}
 local Addon = DJDungeonSpamGuide
@@ -10,7 +24,8 @@ DST.Addon = Addon
 
 -- Addon info
 Addon.name = ADDON_NAME
-Addon.version = GetAddOnMetadata(ADDON_NAME, "Version") or "1.0.0"
+local success, version = pcall(GetAddOnMetadata, ADDON_NAME, "Version")
+Addon.version = (success and version) or "1.0.0"
 
 -- Default saved variables
 local defaults = {
@@ -168,21 +183,3 @@ function Addon:SetTargetFaction(faction)
         self.MainFrame:Refresh()
     end
 end
-
--- Copy table utility
-function CopyTable(t)
-    if type(t) ~= "table" then return t end
-    local copy = {}
-    for k, v in pairs(t) do
-        if type(v) == "table" then
-            copy[k] = CopyTable(v)
-        else
-            copy[k] = v
-        end
-    end
-    return copy
-end
-
--- Debug: Verify Init.lua loaded completely
-print("[DST Debug] Init.lua loaded. GetOptimizationMode exists:", Addon.GetOptimizationMode ~= nil)
-print("[DST Debug] GetTargetFaction exists:", Addon.GetTargetFaction ~= nil)
