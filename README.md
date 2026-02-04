@@ -1,165 +1,244 @@
-# TBC Dungeon Spam Tracker
+# DJ Dungeon Spam Guide
 
-A World of Warcraft addon for the 20th Anniversary Edition (The Burning Crusade phase) that helps Alliance players track dungeon spam progress for optimal leveling and reputation gains from level 60-70.
+**The ultimate leveling companion for World of Warcraft's 20th Anniversary TBC phase!**
 
-## Features
-
-- **Smart Dungeon Recommendations**: Automatically suggests the optimal dungeon based on your current level, reputation, and progression
-- **Real-time Tracking**: Tracks dungeon runs, reputation gains, and experience progress
-- **Zone Detection**: Shows recommendations when entering Outland via the Dark Portal
-- **Comprehensive UI**: Beautiful main frame showing all dungeons, faction progress, and statistics
-- **Run Calculations**: Estimates runs needed to cap reputation or reach next level
-- **Progress Persistence**: Saves all tracking data between sessions
-
-## Installation
-
-### Automatic Deployment
-
-```bash
-./deploy.sh
-```
-
-The script will automatically:
-- Copy addon files to your WoW AddOns folder
-- Verify successful installation
-- Show next steps
-
-### Manual Installation
-
-1. Copy the `DungeonSpamTracker` folder to:
-   ```
-   /Applications/World of Warcraft/_anniversary_/Interface/AddOns/
-   ```
-
-2. Restart WoW or type `/reload` in-game
-
-## Usage
-
-### Commands
-
-- `/dungeonspam` or `/ds` - Open/close the tracker window
-- `/ds recommend` - Show current dungeon recommendation in chat
-- `/ds status` - Show current character status
-- `/ds runs` - Show dungeon run counts
-- `/ds reset` - Reset all tracking data (with confirmation)
-- `/ds help` - Show command help
-
-### Main Interface
-
-The main UI shows:
-1. **Character Header**: Your current level and XP progress
-2. **Current Recommendation**: The optimal dungeon to run next with stats
-3. **All Dungeons**: Complete list with status, rep progress, and estimates
-4. **Faction Progress**: Real-time reputation bars for all TBC factions
-
-### Automatic Features
-
-- **Dark Portal Entry**: When entering Outland for the first time, shows recommended starting dungeon
-- **Dungeon Entry**: Tracks runs automatically when you enter a dungeon (if enabled in settings)
-- **Reputation Updates**: Real-time updates when reputation changes
-- **Level Up**: Shows new dungeon recommendations when you level
-
-## Dungeon Progression Guide
-
-The addon tracks these 15 TBC dungeons in optimal order:
-
-1. **Hellfire Ramparts** (60-62) - Honor Hold
-2. **Blood Furnace** (61-63) - Honor Hold
-3. **Slave Pens** (62-64) - Cenarion Expedition
-4. **Underbog** (63-65) - Cenarion Expedition
-5. **Mana-Tombs** (64-66) - The Consortium
-6. **Auchenai Crypts** (65-67) - Lower City
-7. **Sethekk Halls** (67-68) - Lower City
-8. **Old Hillsbrad** (66-68) - Keepers of Time
-9. **Shadow Labyrinth** (68-70) - Lower City (Exalted)
-10. **Steamvault** (68-70) - Cenarion Expedition (Exalted)
-11. **Shattered Halls** (69-70) - Honor Hold
-12. **Mechanar** (69-70) - The Sha'tar
-13. **Botanica** (70) - The Sha'tar (Best rep/hr)
-14. **Arcatraz** (70) - The Sha'tar
-15. **Black Morass** (70) - Keepers of Time
-
-## Factions & Heroic Keys
-
-### Alliance Factions
-- **Honor Hold** - Hellfire Peninsula dungeons
-- **Cenarion Expedition** - Zangarmarsh dungeons
-- **Lower City** - Auchindoun dungeons
-- **Keepers of Time** - Caverns of Time dungeons
-- **The Sha'tar** - Tempest Keep dungeons
-- **The Consortium** - Mana-Tombs
-
-### Heroic Key Requirements
-All heroic keys require **Honored** reputation with the respective faction.
-
-## Development
-
-### Project Structure
-
-```
-DungeonSpamTracker/
-├── DungeonSpamTracker.toc
-├── Core/
-│   ├── Init.lua
-│   ├── Constants.lua
-│   ├── Events.lua
-│   └── SlashCommands.lua
-├── Data/
-│   ├── DungeonData.lua
-│   ├── ExpPerLevel.lua
-│   └── ReputationThresholds.lua
-├── Modules/
-│   ├── Tracker.lua
-│   ├── Recommender.lua
-│   └── ZoneDetection.lua
-├── UI/
-│   ├── MainFrame.lua
-│   ├── DungeonCard.lua
-│   └── ProgressBar.lua
-└── Locales/
-    └── enUS.lua
-```
-
-### Key Modules
-
-- **Tracker**: Manages run counts, reputation tracking, and XP progress
-- **Recommender**: Smart dungeon recommendation engine
-- **ZoneDetection**: Detects Dark Portal entry and current zone
-- **MainFrame**: Primary UI with all dungeon information
-
-## Data Source
-
-Dungeon statistics (reputation, experience, duration) sourced from `table.csv` based on TBC Classic data.
-
-## Troubleshooting
-
-### Addon doesn't appear in-game
-- Ensure you deployed to the correct folder
-- Check interface version matches (should be 11503 for Anniversary TBC)
-- Type `/reload` to refresh the UI
-
-### Lua errors
-- Check the error message with an error display addon
-- Verify all files were copied correctly
-- Try resetting with `/ds reset`
-
-### Reputation not updating
-- Verify you have the correct faction IDs for Alliance
-- Check that UPDATE_FACTION events are firing
-- Try leaving and re-entering a dungeon
-
-## Version
-
-**1.0.0** - Initial Release
-
-## Author
-
-Dimitar Jilanov
-
-## License
-
-This addon is free to use and modify for personal use.
+Master the art of dungeon spam leveling from 60-70 with intelligent recommendations, comprehensive loot guides, and real-time reputation tracking. Never wonder which dungeon to run next!
 
 ---
 
-**Note**: This addon is designed specifically for the TBC phase of WoW's 20th Anniversary Edition. It tracks Alliance factions and dungeons.
+## 🎯 What Does This Addon Do?
+
+DJ Dungeon Spam Guide analyzes your character's level, reputation, and progression to **automatically recommend the optimal dungeon** for your next run. It tracks your progress across all 15 TBC dungeons and 6 factions, helping you maximize XP gains, reputation, and loot efficiency.
+
+Whether you're a fresh level 60 stepping through the Dark Portal or a seasoned level 70 farming your last Exalted reputation, this addon has you covered!
+
+---
+
+## ✨ Key Features
+
+### 🎲 Smart Dungeon Recommendations
+- **Intelligent Algorithm**: Considers your level, faction reputation, and dungeon completion
+- **Multiple Optimization Modes**: Choose between maximizing XP, reputation, or balanced progression
+- **Heroic Preparation**: Tracks progress toward Honored reputation for heroic keys
+- **Run Estimates**: Shows exactly how many runs needed to cap reputation or reach the next level
+
+### 📊 Comprehensive Tracking
+- **Real-Time Updates**: Automatic tracking of dungeon runs, XP gains, and reputation changes
+- **All 15 TBC Dungeons**: From Hellfire Ramparts to Black Morass
+- **6 Faction Progress Bars**: Visual tracking for Honor Hold, Cenarion Expedition, Lower City, Keepers of Time, The Sha'tar, and The Consortium
+- **Statistics Dashboard**: See your total runs, time invested, and progression at a glance
+
+### 🗺️ Interactive Maps & Guides
+- **Outland Overview Map**: See all dungeon locations with level ranges
+- **Individual Dungeon Maps**: Detailed layouts for each instance
+- **Boss Loot Tables**: Know what drops before you run
+- **Boss Abilities & Strategies**: Quick reference for mechanics and tactics
+- **Location Information**: Zone, entrance location, and requirements
+
+### 🎨 Beautiful Interface
+- **Clean, Modern UI**: Blizzard-style frames that match the game's aesthetic
+- **Minimap Button**: Quick access to all features
+- **Color-Coded Status**: Instantly see recommended dungeons (green) vs completed ones (gray)
+- **Responsive Design**: Updates automatically as you play
+
+---
+
+## 📸 Screenshots
+
+### Main Interface - Smart Recommendations
+![Main Interface](screenshots/01-main-interface.png)
+*See your current recommendation with optimization modes and faction progress tracking*
+
+### Outland Dungeon Map
+![Outland Map](screenshots/02-outland-map.png)
+*Interactive map showing all dungeon locations and level ranges*
+
+### Detailed Loot Information
+![Dungeon Loot](screenshots/03-dungeon-loot.png)
+*Browse boss loot tables to plan your runs*
+
+### Boss Abilities & Strategy
+![Boss Abilities](screenshots/04-boss-abilities.png)
+*Study boss mechanics before you pull*
+
+### Dungeon Maps
+![Dungeon Map](screenshots/05-dungeon-map.png)
+*View detailed layouts for each instance*
+
+### Location & Requirements
+![Dungeon Location](screenshots/06-dungeon-location.png)
+*Find entrance locations and check requirements*
+
+---
+
+## 🚀 Installation
+
+### Via CurseForge Client (Recommended)
+1. Install the CurseForge app
+2. Search for "DJ Dungeon Spam Guide"
+3. Click Install
+4. Launch WoW!
+
+### Via Wago App
+1. Install the Wago app
+2. Browse addons and search for "DJ Dungeon Spam Guide"
+3. Install with one click
+4. You're ready to go!
+
+### Manual Installation
+1. Download the latest release
+2. Extract the `DJDungeonSpamGuide` folder
+3. Place it in your WoW AddOns directory:
+   ```
+   World of Warcraft/_anniversary_/Interface/AddOns/
+   ```
+4. Restart WoW or type `/reload` in-game
+
+---
+
+## 💡 How to Use
+
+### Quick Start
+1. Type `/ds` or `/dungeonspam` to open the main window
+2. Check your **Current Recommendation** at the top
+3. Choose your optimization mode (Maximize XP, Balanced, or Maximize Rep)
+4. Run the recommended dungeon!
+5. The addon automatically tracks your progress
+
+### Slash Commands
+- `/ds` or `/dungeonspam` - Toggle the main window
+- `/ds recommend` - Show current recommendation in chat
+- `/ds status` - Display your character's status
+- `/ds runs` - View your dungeon run counts
+- `/ds reset` - Reset all tracking data (with confirmation)
+- `/ds help` - Show all available commands
+
+### Optimization Modes
+
+**🚀 Maximize XP**
+- Prioritizes dungeons with highest XP per hour
+- Best for speed leveling
+- Recommended for levels 60-69
+
+**⚖️ Balanced** (Recommended)
+- Balances XP gains with reputation progress
+- Ensures steady progression toward heroic keys
+- Great for most players
+
+**⭐ Maximize Rep**
+- Focuses on reaching Honored/Revered/Exalted
+- Essential for heroic key farming
+- Perfect for level 70 players
+
+**🦸 Heroics Mode**
+- Available at level 70 with Honored reputation
+- Tracks heroic-specific rewards
+- Coming soon!
+
+---
+
+## 📋 Dungeon Progression Path
+
+The addon guides you through TBC dungeons in optimal order:
+
+**60-62**: Hellfire Ramparts → Blood Furnace
+**62-64**: Slave Pens → Underbog
+**64-66**: Mana-Tombs → Auchenai Crypts
+**66-68**: Old Hillsbrad → Sethekk Halls
+**68-70**: Shadow Labyrinth, Steamvault, Shattered Halls
+**70**: Mechanar, Botanica, Arcatraz, Black Morass
+
+Each dungeon is associated with specific factions that provide heroic keys at Honored reputation!
+
+---
+
+## 🎖️ Factions & Heroic Keys
+
+| Faction | Dungeons | Heroic Key |
+|---------|----------|------------|
+| **Honor Hold** | Hellfire Ramparts, Blood Furnace, Shattered Halls | Flamewrought Key |
+| **Cenarion Expedition** | Slave Pens, Underbog, Steamvault | Reservoir Key |
+| **Lower City** | Auchenai Crypts, Sethekk Halls, Shadow Labyrinth | Auchenai Key |
+| **Keepers of Time** | Old Hillsbrad, Black Morass | Key of Time |
+| **The Sha'tar** | Mechanar, Botanica, Arcatraz | Warpforged Key |
+| **The Consortium** | Mana-Tombs | N/A |
+
+All heroic keys require **Honored** reputation with the respective faction.
+
+---
+
+## 🔧 Frequently Asked Questions
+
+**Q: Does this work for Horde?**
+A: Currently designed for Alliance factions. Horde support may come in future updates!
+
+**Q: Will this track heroic dungeons?**
+A: Heroic mode tracking is planned for a future release!
+
+**Q: Can I manually mark dungeons as completed?**
+A: The addon automatically tracks dungeon entries. Manual marking is coming soon!
+
+**Q: Does this work with other leveling addons?**
+A: Yes! DJ Dungeon Spam Guide is designed to work alongside other addons.
+
+**Q: I found a bug, where do I report it?**
+A: Join the [Discord](https://discord.gg/v8BVn9qf) and message **KFC Spineshatter**, report on [GitHub Issues](https://github.com/DJilanov/ally-level-addon-wow-tbc/issues), or leave a comment below!
+
+---
+
+## 🎮 Perfect For
+
+✅ Players leveling from 60-70 in TBC
+✅ Dungeon spam enthusiasts
+✅ Reputation farmers
+✅ Anyone preparing for heroics
+✅ Min-max levelers who want optimal routes
+✅ Groups organizing dungeon runs
+
+---
+
+## 🛠️ Technical Details
+
+- **Game Version**: World of Warcraft 20th Anniversary Edition (TBC Phase)
+- **Interface Version**: 20505
+- **Saved Variables**: Yes (progress persists between sessions)
+- **Memory Usage**: Lightweight (<1 MB)
+- **Performance Impact**: Minimal
+
+---
+
+## 📢 Support & Feedback
+
+Love the addon? Leave a comment and rating!
+Found a bug or have a suggestion? Let me know!
+
+**💬 Discord Support**: Join the [support Discord](https://discord.gg/v8BVn9qf) and message **KFC Spineshatter** for help with the addon
+**GitHub**: [ally-level-addon-wow-tbc](https://github.com/DJilanov/ally-level-addon-wow-tbc)
+**Author**: Dimitar Jilanov
+
+---
+
+## 📝 Changelog
+
+### Version 1.0.0
+- Initial release
+- Smart dungeon recommendation engine
+- All 15 TBC dungeons tracked
+- 6 faction reputation bars
+- Interactive Outland map
+- Detailed boss loot tables
+- Boss abilities and strategies
+- Dungeon maps and location info
+- Multiple optimization modes
+- Minimap button
+- Comprehensive slash commands
+
+---
+
+## 🏆 Credits
+
+Dungeon data and statistics sourced from TBC Classic research and community contributions.
+
+---
+
+**Ready to optimize your leveling journey? Download now and never waste a dungeon run again!**

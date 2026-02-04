@@ -11,7 +11,6 @@ ignore:
   - .github
   - .gitignore
   - .pkgmeta
-  - README.md
   - DEVELOPMENT_PLAN.md
   - DEBUGGING_GUIDE.md
   - OPTIMIZATION_MODES.md
