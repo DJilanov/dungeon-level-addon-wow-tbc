@@ -1,5 +1,11 @@
 # Changelog
 
+## Version 1.0.4
+- Fixed reputation cap calculations for accurate "runs to cap" estimates
+- Corrected all dungeon reputation thresholds to match TBC mechanics
+- Normal dungeons now correctly cap at Honored (9000 rep) instead of incorrect values
+- Updated addon screenshot
+
 ## Version 1.0.3
 - Fixed packaging to exclude screenshots folder (reduces download size by 17MB)
 - Cleaned up package to only include essential addon files
