@@ -48,15 +48,17 @@ function Tracker:RefreshReputation()
         local name, description, standingID, barMin, barMax, barValue = GetFactionInfoByID(factionID)
 
         if name then
-            -- barValue is reputation earned within current standing
-            -- We need absolute reputation from neutral
-            local absoluteRep = R:GetAbsoluteRep(standingID, barValue)
+            -- barValue from WoW API is already absolute reputation
+            -- barMin is the absolute rep at the start of the current standing
+            -- Rep within current standing (for display) = barValue - barMin
+            local absoluteRep = barValue
+            local currentRepInStanding = barValue - barMin
 
             self.factionData[factionName] = {
                 name = name,
                 standingID = standingID,
                 standingName = R:GetStandingName(standingID),
-                currentRep = barValue,
+                currentRep = currentRepInStanding,
                 absoluteRep = absoluteRep,
                 barMin = barMin,
                 barMax = barMax,
