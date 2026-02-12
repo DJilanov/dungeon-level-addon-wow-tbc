@@ -225,12 +225,13 @@ function Recommender:GetExaltedGrindRecommendation()
     if not tracker then return nil end
 
     -- Priority order for exalted grinding
+    local C = DST.Constants
     local exaltedPriority = {
-        {dungeon = "Botanica", faction = "The Sha'tar"},        -- Best Sha'tar rep
-        {dungeon = "Steamvault", faction = "Cenarion Expedition"}, -- Best CE rep
-        {dungeon = "Shadow Labyrinth", faction = "Lower City"},   -- Best LC rep
-        {dungeon = "Black Morass", faction = "Keepers of Time"},  -- KoT rep
-        {dungeon = "Shattered Halls", faction = "Honor Hold"},    -- HH rep
+        {dungeon = "Botanica", faction = "The Sha'tar"},                    -- Best Sha'tar rep
+        {dungeon = "Steamvault", faction = "Cenarion Expedition"},          -- Best CE rep
+        {dungeon = "Shadow Labyrinth", faction = "Lower City"},             -- Best LC rep
+        {dungeon = "Black Morass", faction = "Keepers of Time"},            -- KoT rep
+        {dungeon = "Shattered Halls", faction = C.hellfireFaction or "Honor Hold"}, -- Hellfire rep
     }
 
     for _, entry in ipairs(exaltedPriority) do

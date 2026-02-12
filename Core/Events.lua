@@ -59,6 +59,12 @@ function EventFrame:OnAddonLoaded(loadedAddon)
         -- Initialize database
         Addon:InitializeDB()
 
+        -- Detect player faction and set up correct Hellfire faction (Honor Hold / Thrallmar)
+        C:InitPlayerFaction()
+        if DST.DungeonData then
+            DST.DungeonData:InitPlayerFaction()
+        end
+
         -- Initialize modules
         if Addon.Tracker then
             Addon.Tracker:Init()

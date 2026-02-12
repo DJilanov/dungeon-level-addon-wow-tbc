@@ -16,15 +16,15 @@ D.Dungeons = {
         repPerRun = 633,
         repCap = "Honored",
         repCapValue = 9000,
-        expPerRun = 20000,
+        expPerRun = 36000,
         avgDuration = 20,
         minLevel = 60,
         maxLevel = 67,
-        expPerHour = 60000,
+        expPerHour = 108000,
         repPerHour = 1900,
         entrance = "Hellfire Peninsula",
         requiredFor = {
-            "Heroic Keys (Revered Honor Hold)",
+            "Heroic Keys (Revered)",
             "Plate/Mail/Cloth gear",
             "BS/JC/LW recipes",
         },
@@ -44,11 +44,11 @@ D.Dungeons = {
         repPerRun = 750,
         repCap = "Honored",
         repCapValue = 9000,
-        expPerRun = 22000,
+        expPerRun = 39600,
         avgDuration = 22,
         minLevel = 61,
         maxLevel = 68,
-        expPerHour = 60000,
+        expPerHour = 108000,
         repPerHour = 2050,
         entrance = "Hellfire Peninsula",
         requiredFor = {
@@ -71,11 +71,11 @@ D.Dungeons = {
         repPerRun = 850,
         repCap = "Honored",
         repCapValue = 9000,
-        expPerRun = 22000,
+        expPerRun = 39600,
         avgDuration = 22,
         minLevel = 62,
         maxLevel = 69,
-        expPerHour = 60000,
+        expPerHour = 108000,
         repPerHour = 2320,
         entrance = "Zangarmarsh",
         requiredFor = {
@@ -99,11 +99,11 @@ D.Dungeons = {
         repPerRun = 900,
         repCap = "Honored",
         repCapValue = 9000,
-        expPerRun = 23000,
+        expPerRun = 41400,
         avgDuration = 25,
         minLevel = 63,
         maxLevel = 69,
-        expPerHour = 55200,
+        expPerHour = 99400,
         repPerHour = 2160,
         entrance = "Zangarmarsh",
         requiredFor = {
@@ -127,11 +127,11 @@ D.Dungeons = {
         repPerRun = 850,
         repCap = "Honored",
         repCapValue = 9000,
-        expPerRun = 24000,
+        expPerRun = 43200,
         avgDuration = 22,
         minLevel = 64,
         maxLevel = 70,
-        expPerHour = 65500,
+        expPerHour = 117800,
         repPerHour = 2320,
         entrance = "Terokkar Forest",
         requiredFor = {
@@ -155,11 +155,11 @@ D.Dungeons = {
         repPerRun = 700,
         repCap = "Honored",
         repCapValue = 9000,
-        expPerRun = 24000,
+        expPerRun = 43200,
         avgDuration = 25,
         minLevel = 65,
         maxLevel = 70,
-        expPerHour = 57600,
+        expPerHour = 103700,
         repPerHour = 1680,
         entrance = "Terokkar Forest",
         requiredFor = {
@@ -182,11 +182,11 @@ D.Dungeons = {
         repPerRun = 1035,
         repCap = "Honored",
         repCapValue = 9000,
-        expPerRun = 25000,
+        expPerRun = 45000,
         avgDuration = 25,
         minLevel = 67,
         maxLevel = 70,
-        expPerHour = 60000,
+        expPerHour = 108000,
         repPerHour = 2490,
         entrance = "Terokkar Forest",
         requiredFor = {
@@ -208,11 +208,11 @@ D.Dungeons = {
         repPerRun = 975,
         repCap = "Exalted",
         repCapValue = 42000,
-        expPerRun = 26000,
+        expPerRun = 46800,
         avgDuration = 28,
         minLevel = 66,
         maxLevel = 70,
-        expPerHour = 55700,
+        expPerHour = 100300,
         repPerHour = 2090,
         entrance = "Tanaris",
         requiredFor = {
@@ -238,11 +238,11 @@ D.Dungeons = {
         repPerRun = 1750,
         repCap = "Exalted",
         repCapValue = 42000,
-        expPerRun = 27000,
+        expPerRun = 48600,
         avgDuration = 30,
         minLevel = 68,
         maxLevel = 70,
-        expPerHour = 54000,
+        expPerHour = 97200,
         repPerHour = 3500,
         entrance = "Terokkar Forest",
         requiredFor = {
@@ -266,11 +266,11 @@ D.Dungeons = {
         repPerRun = 1700,
         repCap = "Exalted",
         repCapValue = 42000,
-        expPerRun = 27000,
+        expPerRun = 48600,
         avgDuration = 28,
         minLevel = 68,
         maxLevel = 70,
-        expPerHour = 57900,
+        expPerHour = 104100,
         repPerHour = 3640,
         entrance = "Zangarmarsh",
         requiredFor = {
@@ -293,16 +293,16 @@ D.Dungeons = {
         repPerRun = 1600,
         repCap = "Honored",
         repCapValue = 9000,
-        expPerRun = 28000,
+        expPerRun = 50400,
         avgDuration = 25,
         minLevel = 69,
         maxLevel = 70,
-        expPerHour = 67200,
+        expPerHour = 121000,
         repPerHour = 3840,
         entrance = "Hellfire Peninsula",
         requiredFor = {
             "SSC attunement chain",
-            "Best Honor Hold rep at higher levels",
+            "Best Hellfire faction rep at higher levels",
         },
         guide = {
             "Hardest Hellfire Citadel dungeon",
@@ -321,11 +321,11 @@ D.Dungeons = {
         repPerRun = 1600,
         repCap = "Exalted",
         repCapValue = 42000,
-        expPerRun = 28000,
+        expPerRun = 50400,
         avgDuration = 25,
         minLevel = 69,
         maxLevel = 70,
-        expPerHour = 67200,
+        expPerHour = 121000,
         repPerHour = 3840,
         entrance = "Netherstorm",
         requiredFor = {
@@ -350,11 +350,11 @@ D.Dungeons = {
         repPerRun = 2200,
         repCap = "Exalted",
         repCapValue = 42000,
-        expPerRun = 28000,
+        expPerRun = 50400,
         avgDuration = 30,
         minLevel = 70,
         maxLevel = 70,
-        expPerHour = 56000,
+        expPerHour = 100800,
         repPerHour = 4400,
         entrance = "Netherstorm",
         requiredFor = {
@@ -379,11 +379,11 @@ D.Dungeons = {
         repPerRun = 1800,
         repCap = "Exalted",
         repCapValue = 42000,
-        expPerRun = 28000,
+        expPerRun = 50400,
         avgDuration = 30,
         minLevel = 70,
         maxLevel = 70,
-        expPerHour = 56000,
+        expPerHour = 100800,
         repPerHour = 3600,
         entrance = "Netherstorm",
         requiredFor = {
@@ -407,11 +407,11 @@ D.Dungeons = {
         repPerRun = 1055,
         repCap = "Exalted",
         repCapValue = 42000,
-        expPerRun = 27000,
+        expPerRun = 48600,
         avgDuration = 28,
         minLevel = 70,
         maxLevel = 70,
-        expPerHour = 57900,
+        expPerHour = 104100,
         repPerHour = 2260,
         entrance = "Tanaris",
         requiredFor = {
@@ -427,6 +427,23 @@ D.Dungeons = {
         },
     },
 }
+
+-- Update Hellfire Citadel dungeons to use the correct faction for the player's side
+function D:InitPlayerFaction()
+    local C = DST.Constants
+    local hellfireFaction = C.hellfireFaction
+    local hellfireFactionID = C.hellfireFactionID
+
+    if hellfireFaction and hellfireFactionID then
+        local hellfireDungeons = {"Hellfire Ramparts", "Blood Furnace", "Shattered Halls"}
+        for _, name in ipairs(hellfireDungeons) do
+            if self.Dungeons[name] then
+                self.Dungeons[name].faction = hellfireFaction
+                self.Dungeons[name].factionID = hellfireFactionID
+            end
+        end
+    end
+end
 
 -- Get dungeon by name
 function D:GetDungeon(name)

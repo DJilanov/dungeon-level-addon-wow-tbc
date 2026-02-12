@@ -304,8 +304,9 @@ function Addon:CreateMainFrame()
     frame.factionDropdown.menu:SetFrameLevel(frame:GetFrameLevel() + 10)
     frame.factionDropdown.menu:Hide()
 
-    -- Create faction buttons
-    local factions = {"Auto", "Honor Hold", "Cenarion Expedition", "The Sha'tar", "Lower City", "Keepers of Time", "The Consortium"}
+    -- Create faction buttons (use detected Hellfire faction name)
+    local hellfireFaction = C.hellfireFaction or "Honor Hold"
+    local factions = {"Auto", hellfireFaction, "Cenarion Expedition", "The Sha'tar", "Lower City", "Keepers of Time", "The Consortium"}
     frame.factionDropdown.buttons = {}
 
     for i, faction in ipairs(factions) do
@@ -599,7 +600,7 @@ function Addon:CreateMainFrame()
     -- Create faction progress bars
     frame.factionBars = {}
     local factionOrder = {
-        "Honor Hold",
+        C.hellfireFaction or "Honor Hold",
         "Cenarion Expedition",
         "The Sha'tar",
         "Lower City",

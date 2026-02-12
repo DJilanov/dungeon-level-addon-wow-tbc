@@ -4,15 +4,43 @@ local ADDON_NAME, DST = ...
 DST.Constants = {}
 local C = DST.Constants
 
--- Faction IDs (Alliance)
+-- Faction IDs (shared across both factions)
 C.FACTION_IDS = {
-    ["Honor Hold"] = 946,
     ["Cenarion Expedition"] = 942,
     ["The Sha'tar"] = 935,
     ["Lower City"] = 1011,
     ["Keepers of Time"] = 989,
     ["The Consortium"] = 933,
 }
+
+-- Hellfire faction (faction-specific: Honor Hold for Alliance, Thrallmar for Horde)
+C.playerFaction = nil
+C.hellfireFaction = "Honor Hold"   -- default, updated in InitPlayerFaction
+C.hellfireFactionID = 946
+
+-- Detect player faction and set up correct Hellfire faction
+function C:InitPlayerFaction()
+    local faction = UnitFactionGroup("player")
+    self.playerFaction = faction
+
+    if faction == "Horde" then
+        self.hellfireFaction = "Thrallmar"
+        self.hellfireFactionID = 947
+    else
+        self.hellfireFaction = "Honor Hold"
+        self.hellfireFactionID = 946
+    end
+
+    -- Add Hellfire faction to FACTION_IDS (modify in-place so cached refs stay valid)
+    -- Remove old Hellfire faction if present
+    self.FACTION_IDS["Honor Hold"] = nil
+    self.FACTION_IDS["Thrallmar"] = nil
+    -- Add the correct one
+    self.FACTION_IDS[self.hellfireFaction] = self.hellfireFactionID
+
+    -- Update heroic keys
+    self.HEROIC_KEYS["Hellfire Citadel"].faction = self.hellfireFaction
+end
 
 -- Reputation standing thresholds
 C.REP_STANDINGS = {

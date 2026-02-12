@@ -30,8 +30,9 @@ DST.L = {
     ["REP_PER_RUN"] = "Rep/Run",
     ["EXP_PER_RUN"] = "XP/Run",
 
-    -- Factions (Alliance)
+    -- Factions (Alliance / Horde)
     ["Honor Hold"] = "Honor Hold",
+    ["Thrallmar"] = "Thrallmar",
     ["Cenarion Expedition"] = "Cenarion Expedition",
     ["The Sha'tar"] = "The Sha'tar",
     ["Lower City"] = "Lower City",

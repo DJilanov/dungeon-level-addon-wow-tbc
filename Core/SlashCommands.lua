@@ -102,8 +102,12 @@ SlashCmdList["DUNGEONSPAM"] = function(msg)
         local faction = args[2]
         if faction then
             -- Try to match faction name (case insensitive)
+            local C = DST.Constants
+            local hellfireFaction = C.hellfireFaction or "Honor Hold"
             local factions = {
-                ["honor"] = "Honor Hold",
+                ["honor"] = hellfireFaction,
+                ["thrallmar"] = hellfireFaction,
+                ["hellfire"] = hellfireFaction,
                 ["cenarion"] = "Cenarion Expedition",
                 ["shatar"] = "The Sha'tar",
                 ["lower"] = "Lower City",
@@ -121,7 +125,7 @@ SlashCmdList["DUNGEONSPAM"] = function(msg)
                     Addon:Print(string.format(L["MODE_CHANGED"], L["OPT_REP"]))
                 end
             else
-                Addon:Print("Unknown faction. Use: honor, cenarion, shatar, lower, keepers, consortium")
+                Addon:Print("Unknown faction. Use: honor/thrallmar, cenarion, shatar, lower, keepers, consortium")
             end
         else
             local current = Addon:GetTargetFaction()
